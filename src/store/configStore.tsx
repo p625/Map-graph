@@ -7,20 +7,31 @@ import {
   type ReactNode,
 } from 'react'
 import { districts } from '../data/seed/districts'
-import { regionalOffices } from '../data/seed/regionalOffices'
 import { workplaces } from '../data/seed/workplaces'
+import { sanitizeMapColor } from '../domain/color/mapColorValidation'
 import type {
   DistrictWorkplaceAssignments,
   WorkplaceRegionalAssignments,
-} from '../domain/types/assignment'
+} from '../domain/types'
+import {
+  snapshotToRegionalOffices,
+  snapshotToWorkplaces,
+  useOrganizationState,
+} from './organizationStore'
+import type { OrganizationSnapshot } from '../domain/organization/types'
+import { isOrganizationSynced } from '../domain/organization/organizationState'
+import { snapshotToConfigAssignments } from '../domain/organization/organizationSync'
 import { buildDefaultDistrictAssignments, loadJson, saveJson } from '../utils/storage'
 
-const CONFIG_STORAGE_KEY = 'map-graph-config-v3'
+const CONFIG_STORAGE_KEY = 'map-graph-config-v4'
+const ORG_STORAGE_KEY = 'map-graph-org-v1'
 const MAX_HISTORY = 50
 
 export interface ConfigState {
   districtWorkplaceAssignments: DistrictWorkplaceAssignments
   workplaceRegionalAssignments: WorkplaceRegionalAssignments
+  districtDisplayColors: Record<string, string>
+  workplaceDisplayColors: Record<string, string>
 }
 
 interface HistoryState {
@@ -32,6 +43,26 @@ interface HistoryState {
 export type ConfigAction =
   | { type: 'set-district-workplace'; districtId: string; workplaceId: string | null }
   | { type: 'set-workplace-regional'; workplaceId: string; regionalOfficeId: string | null }
+  | { type: 'set-district-color'; districtId: string; color: string }
+  | { type: 'reset-district-color'; districtId: string }
+  | { type: 'reset-all-district-colors' }
+  | { type: 'set-workplace-color'; workplaceId: string; color: string }
+  | { type: 'reset-workplace-color'; workplaceId: string }
+  | { type: 'reset-all-workplace-colors' }
+  | {
+      type: 'apply-organization-sync'
+      districtWorkplaceAssignments: DistrictWorkplaceAssignments
+      workplaceRegionalAssignments: WorkplaceRegionalAssignments
+    }
+  | {
+      type: 'sync-derived-organization-assignments'
+      districtWorkplaceAssignments: DistrictWorkplaceAssignments
+      workplaceRegionalAssignments: WorkplaceRegionalAssignments
+    }
+  | {
+      type: 'sync-derived-regional-assignments'
+      workplaceRegionalAssignments: WorkplaceRegionalAssignments
+    }
   | { type: 'reset-default-assignments' }
   | { type: 'undo' }
   | { type: 'redo' }
@@ -41,17 +72,45 @@ function cloneConfig(state: ConfigState): ConfigState {
   return {
     districtWorkplaceAssignments: { ...state.districtWorkplaceAssignments },
     workplaceRegionalAssignments: { ...state.workplaceRegionalAssignments },
+    districtDisplayColors: { ...state.districtDisplayColors },
+    workplaceDisplayColors: { ...state.workplaceDisplayColors },
+  }
+}
+
+function normalizeConfigState(stored: Partial<ConfigState> | null): ConfigState {
+  if (!stored) {
+    return {
+      districtWorkplaceAssignments: buildDefaultDistrictAssignments(districts, workplaces),
+      workplaceRegionalAssignments: {},
+      districtDisplayColors: {},
+      workplaceDisplayColors: {},
+    }
+  }
+  return {
+    districtWorkplaceAssignments:
+      stored.districtWorkplaceAssignments ??
+      buildDefaultDistrictAssignments(districts, workplaces),
+    workplaceRegionalAssignments: stored.workplaceRegionalAssignments ?? {},
+    districtDisplayColors: stored.districtDisplayColors ?? {},
+    workplaceDisplayColors: stored.workplaceDisplayColors ?? {},
   }
 }
 
 function loadInitialConfig(): ConfigState {
-  const stored = loadJson<ConfigState | null>(CONFIG_STORAGE_KEY, null)
-  if (stored) return stored
+  const stored = loadJson<Partial<ConfigState> | null>(CONFIG_STORAGE_KEY, null)
+  const base = normalizeConfigState(stored)
+  const orgSnapshot = loadJson<OrganizationSnapshot | null>(ORG_STORAGE_KEY, null)
 
-  return {
-    districtWorkplaceAssignments: buildDefaultDistrictAssignments(districts, workplaces),
-    workplaceRegionalAssignments: {},
+  if (orgSnapshot && isOrganizationSynced(orgSnapshot)) {
+    const fromOrg = snapshotToConfigAssignments(orgSnapshot)
+    return {
+      ...base,
+      districtWorkplaceAssignments: fromOrg.districtWorkplaceAssignments,
+      workplaceRegionalAssignments: fromOrg.workplaceRegionalAssignments,
+    }
   }
+
+  return base
 }
 
 function applyConfigAction(state: ConfigState, action: ConfigAction): ConfigState {
@@ -68,10 +127,52 @@ function applyConfigAction(state: ConfigState, action: ConfigAction): ConfigStat
       else delete next[action.workplaceId]
       return { ...state, workplaceRegionalAssignments: next }
     }
+    case 'set-district-color': {
+      const next = { ...state.districtDisplayColors, [action.districtId]: action.color }
+      return { ...state, districtDisplayColors: next }
+    }
+    case 'reset-district-color': {
+      const next = { ...state.districtDisplayColors }
+      delete next[action.districtId]
+      return { ...state, districtDisplayColors: next }
+    }
+    case 'reset-all-district-colors':
+      return { ...state, districtDisplayColors: {} }
+    case 'set-workplace-color': {
+      const color = sanitizeMapColor(action.color)
+      if (!color) return state
+      const next = { ...state.workplaceDisplayColors, [action.workplaceId]: color }
+      return { ...state, workplaceDisplayColors: next }
+    }
+    case 'reset-workplace-color': {
+      const next = { ...state.workplaceDisplayColors }
+      delete next[action.workplaceId]
+      return { ...state, workplaceDisplayColors: next }
+    }
+    case 'reset-all-workplace-colors':
+      return { ...state, workplaceDisplayColors: {} }
     case 'reset-default-assignments':
       return {
         ...state,
         districtWorkplaceAssignments: buildDefaultDistrictAssignments(districts, workplaces),
+      }
+    case 'apply-organization-sync':
+      return {
+        districtWorkplaceAssignments: { ...action.districtWorkplaceAssignments },
+        workplaceRegionalAssignments: { ...action.workplaceRegionalAssignments },
+        districtDisplayColors: { ...state.districtDisplayColors },
+        workplaceDisplayColors: { ...state.workplaceDisplayColors },
+      }
+    case 'sync-derived-organization-assignments':
+      return {
+        ...state,
+        districtWorkplaceAssignments: { ...action.districtWorkplaceAssignments },
+        workplaceRegionalAssignments: { ...action.workplaceRegionalAssignments },
+      }
+    case 'sync-derived-regional-assignments':
+      return {
+        ...state,
+        workplaceRegionalAssignments: { ...action.workplaceRegionalAssignments },
       }
     default:
       return state
@@ -100,15 +201,24 @@ function historyReducer(state: HistoryState, action: ConfigAction): HistoryState
   }
 
   if (action.type === 'reset') {
-    const initial = {
-      districtWorkplaceAssignments: buildDefaultDistrictAssignments(districts, workplaces),
-      workplaceRegionalAssignments: {},
-    }
+    const initial = normalizeConfigState(null)
     return {
       past: [...state.past, cloneConfig(state.present)].slice(-MAX_HISTORY),
       present: initial,
       future: [],
     }
+  }
+
+  if (action.type === 'sync-derived-regional-assignments') {
+    const nextPresent = applyConfigAction(state.present, action)
+    if (nextPresent === state.present) return state
+    return { ...state, present: nextPresent }
+  }
+
+  if (action.type === 'sync-derived-organization-assignments') {
+    const nextPresent = applyConfigAction(state.present, action)
+    if (nextPresent === state.present) return state
+    return { ...state, present: nextPresent }
   }
 
   const nextPresent = applyConfigAction(state.present, action)
@@ -166,9 +276,11 @@ export function useConfigHistory() {
 }
 
 export function useConfigData() {
+  const { snapshot } = useOrganizationState()
   return {
     districts,
-    workplaces,
-    regionalOffices,
+    workplaces: snapshotToWorkplaces(snapshot),
+    regionalOffices: snapshotToRegionalOffices(snapshot),
+    organizationSnapshot: snapshot,
   }
 }

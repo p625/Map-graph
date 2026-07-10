@@ -1,3 +1,5 @@
+import type { Leader, OrgUnit, OrganizationWorkplace } from '../organization/types'
+import type { RegionScope } from '../region/types'
 import type {
   DistrictWorkplaceAssignments,
   WorkplaceRegionalAssignments,
@@ -25,6 +27,7 @@ export interface LegendItem {
   id: string
   label: string
   color: string
+  subtitle?: string
   count?: number
 }
 
@@ -44,6 +47,14 @@ export interface VisualizationContext {
   regionalOffices: RegionalOffice[]
   districtWorkplaceAssignments: DistrictWorkplaceAssignments
   workplaceRegionalAssignments: WorkplaceRegionalAssignments
+  districtDisplayColors?: Record<string, string>
+  workplaceDisplayColors?: Record<string, string>
+  organization?: {
+    leaders: Leader[]
+    orgUnits: OrgUnit[]
+    workplaces: OrganizationWorkplace[]
+  }
+  regionScope?: RegionScope
   dataset?: Dataset
   records?: DatasetRecord[]
   column?: DatasetColumn
@@ -56,6 +67,10 @@ export interface VisualizationPlugin {
   description: string
   requiresDataset: boolean
   requiresColumn: boolean
+  /** Vyžaduje synchronizovanou organizaci (vedoucí, org. složky). */
+  requiresOrganization?: boolean
+  /** Hover a klik na jednotlivý okres, ne na union pracoviště. */
+  districtInteraction?: boolean
   supportsColumn: (column: DatasetColumn) => boolean
   resolveColors: (context: VisualizationContext) => DistrictColorMap
   buildLegend: (context: VisualizationContext) => LegendSpec

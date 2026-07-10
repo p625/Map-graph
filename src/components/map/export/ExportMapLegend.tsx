@@ -44,12 +44,19 @@ export function ExportMapLegend({ legend, compact = false }: ExportMapLegendProp
             </p>
           ) : (
             legend.items.map((item) => (
-              <div key={item.id} className="flex items-center gap-2" style={{ fontSize: compact ? 11 : 12 }}>
+              <div key={item.id} className="flex items-start gap-2" style={{ fontSize: compact ? 11 : 12 }}>
                 <span
-                  className="inline-block shrink-0 rounded-sm border border-slate-200"
+                  className="mt-0.5 inline-block shrink-0 rounded-sm border border-slate-200"
                   style={{ backgroundColor: item.color, width: compact ? 10 : 12, height: compact ? 10 : 12 }}
                 />
-                <span className="text-slate-700">{item.label}</span>
+                <div>
+                  <span className="text-slate-700">{item.label}</span>
+                  {item.subtitle && (
+                    <div className="text-slate-500" style={{ fontSize: compact ? 10 : 11 }}>
+                      {item.subtitle}
+                    </div>
+                  )}
+                </div>
               </div>
             ))
           )}

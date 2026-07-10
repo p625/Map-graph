@@ -29,8 +29,22 @@ export function migrateDatasetStatus(status: string): DatasetStatus {
 
 export const DATA_VISUALIZATION_PLUGINS = ['choropleth', 'categorical'] as const
 
+export const ORGANIZATION_PLUGINS = ['by-leader'] as const
+
 export function isDataVisualizationPlugin(pluginId: string): boolean {
   return (DATA_VISUALIZATION_PLUGINS as readonly string[]).includes(pluginId)
+}
+
+export function requiresOrganizationSync(pluginId: string): boolean {
+  return (ORGANIZATION_PLUGINS as readonly string[]).includes(pluginId)
+}
+
+export function canUseOrganizationVisualization(
+  pluginId: string,
+  organizationSynced: boolean,
+): boolean {
+  if (!requiresOrganizationSync(pluginId)) return true
+  return organizationSynced
 }
 
 export function canUseDataVisualization(

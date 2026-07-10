@@ -31,7 +31,7 @@ export function detectWorkplaceColumn(
   let bestScore = 0
 
   for (const header of headers) {
-    const values = rows.map((row) => normalizeText(row[header] ?? '')).filter(Boolean)
+    const values = rows.map((row) => normalizeText(String(row[header] ?? ''))).filter(Boolean)
     const score = values.filter((value) =>
       workplaces.some((workplace) => normalizeText(workplace.name) === value),
     ).length

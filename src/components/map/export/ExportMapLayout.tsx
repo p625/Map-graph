@@ -1,7 +1,14 @@
 import { forwardRef } from 'react'
+import { computeExportLayout } from '../../../domain/export/exportMapLayout'
+import type { ExportMapSizing } from '../../../domain/export/exportMapLayout'
+import type { LabelContentMode, LabelScope } from '../../../domain/labels/labelEngine'
+import type { BoundaryVisibility } from '../../../domain/territory/types'
 import type { Dataset } from '../../../domain/types/dataset'
 import type { DatasetColumn } from '../../../domain/types/datasetColumn'
-import type { DistrictColorMap, LegendSpec } from '../../../domain/visualization/types'
+import type { RegionScope } from '../../../domain/region/types'
+import type { RegionRenderMode } from '../../../domain/region/regionFocus'
+import type { DistrictColorMap, LegendSpec, VisualizationContext } from '../../../domain/visualization/types'
+import { useMapRenderModel } from '../../../hooks/useMapRenderModel'
 import { CzechMap } from '../CzechMap'
 import { ExportMapLegend } from './ExportMapLegend'
 
@@ -14,12 +21,20 @@ export interface ExportMapLayoutProps {
   height: number
   showLegend: boolean
   showDatasetInfo: boolean
+  showLabels: boolean
+  labelScope: LabelScope
+  labelContentMode?: LabelContentMode
+  boundaryVisibility: BoundaryVisibility
+  context?: VisualizationContext
   dataset?: Dataset
   column?: DatasetColumn
   pluginName?: string
   themeName?: string
   createdAt?: Date
   strokeColor?: string
+  regionScope?: RegionScope
+  regionRenderMode?: RegionRenderMode
+  mapSizing?: ExportMapSizing
 }
 
 export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
@@ -33,29 +48,60 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
       height,
       showLegend,
       showDatasetInfo,
+      showLabels,
+      labelScope,
+      labelContentMode = 'name',
+      boundaryVisibility,
+      context,
       dataset,
       column,
       pluginName,
       themeName,
       createdAt = new Date(),
       strokeColor,
+      regionScope,
+      regionRenderMode = 'export-country',
+      mapSizing,
     },
     ref,
   ) {
-    const padding = Math.round(width * 0.04)
-    const headerHeight = Math.round(height * 0.12)
-    const footerHeight = Math.round(height * 0.06)
-    const contentHeight = height - headerHeight - footerHeight - padding * 2
-    const legendWidth = showLegend ? Math.round(width * 0.22) : 0
-    const mapWidth = width - padding * 2 - legendWidth - (showLegend ? padding : 0)
-    const mapHeight = contentHeight
+    const layout = computeExportLayout({
+      width,
+      height,
+      showLegend,
+      showDatasetInfo,
+      title,
+      subtitle,
+      sizing: mapSizing,
+    })
 
-    const mapRenderWidth = Math.round(mapWidth * 0.95)
-    const mapRenderHeight = Math.round(mapHeight * 0.95)
+    const {
+      padding,
+      headerHeight,
+      footerHeight,
+      legendWidth,
+      mapWidth,
+      mapHeight,
+      mapOnly,
+    } = layout
 
     const titleSize = Math.round(width * 0.028)
     const subtitleSize = Math.round(width * 0.016)
     const footerSize = Math.round(width * 0.012)
+
+    const { resolver, territories, fillStyles, boundaryLayers, labels, viewport } = useMapRenderModel({
+      width: mapWidth,
+      height: mapHeight,
+      colors,
+      strokeColor,
+      boundaryVisibility,
+      showLabels,
+      labelScope,
+      labelContentMode,
+      context,
+      regionScope,
+      regionRenderMode,
+    })
 
     return (
       <div
@@ -72,57 +118,69 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
           flexDirection: 'column',
         }}
       >
-        <div style={{ padding: `${padding}px ${padding}px 0`, minHeight: headerHeight }}>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: titleSize,
-              fontWeight: 700,
-              lineHeight: 1.2,
-              color: '#0f172a',
-            }}
-          >
-            {title || 'Mapový graf'}
-          </h1>
-          {subtitle && (
-            <p
-              style={{
-                margin: `${Math.round(titleSize * 0.3)}px 0 0`,
-                fontSize: subtitleSize,
-                color: '#475569',
-                lineHeight: 1.4,
-              }}
-            >
-              {subtitle}
-            </p>
-          )}
-        </div>
+        {Boolean(title.trim() || subtitle.trim()) && (
+          <div style={{ padding: `${padding}px ${padding}px 0`, minHeight: headerHeight }}>
+            {title.trim() && (
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: titleSize,
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  color: '#0f172a',
+                }}
+              >
+                {title}
+              </h1>
+            )}
+            {subtitle && (
+              <p
+                style={{
+                  margin: `${Math.round(titleSize * 0.3)}px 0 0`,
+                  fontSize: subtitleSize,
+                  color: '#475569',
+                  lineHeight: 1.4,
+                }}
+              >
+                {subtitle}
+              </p>
+            )}
+          </div>
+        )}
 
         <div
           style={{
             flex: 1,
             display: 'flex',
-            padding: `${Math.round(padding * 0.5)}px ${padding}px`,
-            gap: padding,
+            padding: mapOnly
+              ? `${padding}px`
+              : `${Math.round(padding * 0.5)}px ${padding}px`,
+            gap: showLegend ? padding : 0,
             minHeight: 0,
           }}
         >
           <div
             style={{
-              flex: 1,
+              width: mapWidth,
+              height: mapHeight,
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              alignItems: 'stretch',
+              justifyContent: 'stretch',
               minWidth: 0,
+              flexShrink: 0,
             }}
           >
             <CzechMap
-              colors={colors}
+              territories={territories}
+              fillStyles={fillStyles}
+              boundaryLayers={boundaryLayers}
+              labels={labels}
+              resolver={resolver}
               interactive={false}
-              width={mapRenderWidth}
-              height={mapRenderHeight}
+              width={mapWidth}
+              height={mapHeight}
+              viewport={viewport?.viewBox ?? null}
               className=""
-              strokeColor={strokeColor}
             />
           </div>
 
@@ -136,6 +194,7 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
                 borderLeft: '1px solid #e2e8f0',
                 paddingLeft: padding,
                 overflow: 'hidden',
+                flexShrink: 0,
               }}
             >
               <ExportMapLegend legend={legend} compact={width < 1600} />
@@ -171,20 +230,22 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
           )}
         </div>
 
-        <div
-          style={{
-            padding: `0 ${padding}px ${padding}px`,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            fontSize: footerSize,
-            color: '#64748b',
-            minHeight: footerHeight,
-          }}
-        >
-          <span>Vytvořeno: {createdAt.toLocaleDateString('cs-CZ')}</span>
-          <span>Map Graph</span>
-        </div>
+        {!mapOnly && footerHeight > 0 && (
+          <div
+            style={{
+              padding: `0 ${padding}px ${padding}px`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: footerSize,
+              color: '#64748b',
+              minHeight: footerHeight,
+            }}
+          >
+            <span>Vytvořeno: {createdAt.toLocaleDateString('cs-CZ')}</span>
+            <span>Map Graph</span>
+          </div>
+        )}
       </div>
     )
   },

@@ -4,6 +4,7 @@ import {
   createEmptyColorMap,
   getNumericColumnValue,
   getRecordForDistrict,
+  getScopedDistricts,
 } from '../contextUtils'
 
 export const choroplethPlugin: VisualizationPlugin = {
@@ -18,9 +19,10 @@ export const choroplethPlugin: VisualizationPlugin = {
     const columnKey = context.column?.key
     const scale = context.theme.sequentialScale
     const noData = context.theme.noDataFill
+    const scopedDistricts = getScopedDistricts(context)
     const values: number[] = []
 
-    for (const district of context.districts) {
+    for (const district of scopedDistricts) {
       const record = getRecordForDistrict(context, district.id)
       const value = getNumericColumnValue(record, columnKey)
       if (value !== null) values.push(value)
@@ -41,7 +43,8 @@ export const choroplethPlugin: VisualizationPlugin = {
   },
   buildLegend: (context) => {
     const columnKey = context.column?.key
-    const values = context.districts
+    const scopedDistricts = getScopedDistricts(context)
+    const values = scopedDistricts
       .map((district) => getNumericColumnValue(getRecordForDistrict(context, district.id), columnKey))
       .filter((value): value is number => value !== null)
 

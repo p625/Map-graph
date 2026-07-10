@@ -1,6 +1,12 @@
-import { canUseDataVisualization } from '../../domain/dataset/datasetValidation'
+import { useEffect } from 'react'
+import {
+  canUseDataVisualization,
+  canUseOrganizationVisualization,
+} from '../../domain/dataset/datasetValidation'
 import { visualizationRegistry } from '../../domain/visualization/VisualizationRegistry'
 import { useActiveDataset, useDatasetState } from '../../store/datasetStore'
+import { useConfigData } from '../../store/configStore'
+import { isOrganizationSynced } from '../../store/organizationStore'
 import { useMapActions, useMapState } from '../../store/mapStore'
 import { MapGuardBanner } from './MapGuardBanner'
 import { ThemeSelector } from './ThemeSelector'
@@ -10,6 +16,8 @@ export function MapControls() {
   const { setPlugin, setDataset, setColumn } = useMapActions()
   const { datasets } = useDatasetState()
   const { dataset } = useActiveDataset(datasetId)
+  const { organizationSnapshot } = useConfigData()
+  const orgSynced = isOrganizationSynced(organizationSnapshot)
   const plugin = visualizationRegistry.getById(pluginId)
 
   const readyDatasets = datasets.filter((d) => d.status === 'ready')
@@ -18,6 +26,15 @@ export function MapControls() {
 
   const dataVizBlocked =
     plugin?.requiresDataset && !canUseDataVisualization(pluginId, dataset?.status)
+
+  const orgVizBlocked =
+    plugin?.requiresOrganization && !canUseOrganizationVisualization(pluginId, orgSynced)
+
+  useEffect(() => {
+    if (datasetId && !datasets.some((item) => item.id === datasetId)) {
+      setDataset(null)
+    }
+  }, [datasetId, datasets, setDataset])
 
   return (
     <div className="space-y-4">
@@ -33,11 +50,15 @@ export function MapControls() {
           >
             {visualizationRegistry.getAll().map((item) => {
               const needsReady = item.requiresDataset
-              const disabled = needsReady && readyDatasets.length === 0
+              const needsOrg = item.requiresOrganization
+              const disabled =
+                (needsReady && readyDatasets.length === 0) ||
+                (needsOrg && !orgSynced)
               return (
                 <option key={item.id} value={item.id} disabled={disabled}>
                   {item.name}
-                  {disabled ? ' (vyžaduje dataset)' : ''}
+                  {needsReady && readyDatasets.length === 0 ? ' (vyžaduje dataset)' : ''}
+                  {needsOrg && !orgSynced ? ' (vyžaduje sync organizace)' : ''}
                 </option>
               )
             })}
@@ -86,7 +107,9 @@ export function MapControls() {
 
         {!plugin?.requiresDataset && (
           <div className="text-sm text-slate-500 md:col-span-2">
-            Organizační vizualizace používá konfiguraci pracovišť a regionů.
+            {orgVizBlocked
+              ? 'Synchronizujte organizaci pro režim podle vedoucích.'
+              : 'Organizační vizualizace používá konfiguraci pracovišť, regionů a barev.'}
           </div>
         )}
       </div>

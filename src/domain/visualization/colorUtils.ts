@@ -31,7 +31,10 @@ export const REGIONAL_PALETTE = [
   '#9d174d',
 ]
 
-export const SEQUENTIAL_SCALE = ['#eff6ff', '#bfdbfe', '#60a5fa', '#2563eb', '#1e3a8a']
+export const SEQUENTIAL_SCALE = [
+  '#dbeafe', '#bfdbfe', '#93c5fd', '#7dd3fc', '#60a5fa',
+  '#3b82f6', '#2563eb', '#1d4ed8', '#1e40af', '#1e3a8a', '#172554',
+]
 
 export const CATEGORICAL_PALETTE = [
   '#2563eb',
@@ -70,7 +73,7 @@ export function interpolateColor(
   }
 
   const ratio = Math.max(0, Math.min(1, (value - min) / (max - min)))
-  const index = Math.round(ratio * (scale.length - 1))
+  const index = Math.min(scale.length - 1, Math.floor(ratio * scale.length))
   return scale[index]!
 }
 

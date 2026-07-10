@@ -8,6 +8,15 @@ import {
   type ReactNode,
 } from 'react'
 import { defaultThemeId } from '../domain/visualization/themes'
+import type { LabelContentMode, LabelScope, LabelSizePreset } from '../domain/labels/labelEngine'
+import {
+  DEFAULT_LABEL_FONT_SIZE_PX,
+  PRESET_FONT_SIZE_PX,
+  sanitizeLabelFontSizePx,
+} from '../domain/labels/labelEngine'
+import { DEFAULT_BOUNDARY_VISIBILITY } from '../domain/export/mapTemplates'
+import type { BoundaryVisibility } from '../domain/territory/types'
+import type { RegionViewMode } from '../domain/region/types'
 import { loadJson, saveJson } from '../utils/storage'
 
 export interface HoveredPolygon {
@@ -21,6 +30,17 @@ interface MapState {
   columnKey: string | null
   themeId: string
   hoveredPolygon: HoveredPolygon | null
+  boundaryVisibility: BoundaryVisibility
+  showLabels: boolean
+  labelScope: LabelScope
+  labelContentMode: LabelContentMode
+  labelSizePreset: LabelSizePreset
+  labelFontSizePx: number
+  labelHaloEnabled: boolean
+  labelHideOnCollision: boolean
+  selectedPolygon: HoveredPolygon | null
+  focusedRegionId: string | null
+  regionViewMode: RegionViewMode
 }
 
 type MapAction =
@@ -29,8 +49,22 @@ type MapAction =
   | { type: 'set-column'; columnKey: string | null }
   | { type: 'set-theme'; themeId: string }
   | { type: 'set-hovered-polygon'; polygon: HoveredPolygon | null }
+  | { type: 'set-boundary-visibility'; visibility: BoundaryVisibility }
+  | { type: 'toggle-boundary'; level: keyof BoundaryVisibility }
+  | { type: 'set-show-labels'; showLabels: boolean }
+  | { type: 'set-label-scope'; labelScope: LabelScope }
+  | { type: 'set-label-content-mode'; labelContentMode: LabelContentMode }
+  | { type: 'set-label-size-preset'; labelSizePreset: LabelSizePreset }
+  | { type: 'set-label-font-size-px'; labelFontSizePx: number }
+  | { type: 'reset-label-font-size' }
+  | { type: 'set-label-halo-enabled'; labelHaloEnabled: boolean }
+  | { type: 'set-label-hide-on-collision'; labelHideOnCollision: boolean }
+  | { type: 'set-selected-polygon'; polygon: HoveredPolygon | null }
+  | { type: 'set-focused-region'; regionId: string }
+  | { type: 'clear-focused-region' }
+  | { type: 'validate-focused-region'; validRegionIds: string[] }
 
-const MAP_STORAGE_KEY = 'map-graph-map-v2'
+const MAP_STORAGE_KEY = 'map-graph-map-v3'
 
 const initialState: MapState = {
   pluginId: 'neutral',
@@ -38,10 +72,41 @@ const initialState: MapState = {
   columnKey: null,
   themeId: defaultThemeId,
   hoveredPolygon: null,
+  boundaryVisibility: DEFAULT_BOUNDARY_VISIBILITY,
+  showLabels: true,
+  labelScope: 'workplace',
+  labelContentMode: 'name',
+  labelSizePreset: 'small',
+  labelFontSizePx: PRESET_FONT_SIZE_PX.small,
+  labelHaloEnabled: false,
+  labelHideOnCollision: false,
+  selectedPolygon: null,
+  focusedRegionId: null,
+  regionViewMode: 'overview',
 }
 
 function loadInitialMapState(): MapState {
-  return loadJson<MapState>(MAP_STORAGE_KEY, initialState)
+  const stored = loadJson<Partial<MapState> | null>(MAP_STORAGE_KEY, null)
+  if (!stored) return initialState
+  return {
+    ...initialState,
+    ...stored,
+    hoveredPolygon: null,
+    selectedPolygon: null,
+    boundaryVisibility: {
+      ...DEFAULT_BOUNDARY_VISIBILITY,
+      ...stored.boundaryVisibility,
+    },
+    labelContentMode: stored.labelContentMode ?? 'name',
+    labelSizePreset: stored.labelSizePreset ?? 'small',
+    labelFontSizePx: sanitizeLabelFontSizePx(
+      stored.labelFontSizePx ?? PRESET_FONT_SIZE_PX[stored.labelSizePreset ?? 'small'],
+    ),
+    labelHaloEnabled: stored.labelHaloEnabled ?? false,
+    labelHideOnCollision: stored.labelHideOnCollision ?? false,
+    focusedRegionId: stored.focusedRegionId ?? null,
+    regionViewMode: stored.regionViewMode ?? 'overview',
+  }
 }
 
 function mapReducer(state: MapState, action: MapAction): MapState {
@@ -56,6 +121,68 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       return { ...state, themeId: action.themeId }
     case 'set-hovered-polygon':
       return { ...state, hoveredPolygon: action.polygon }
+    case 'set-boundary-visibility':
+      return { ...state, boundaryVisibility: action.visibility }
+    case 'toggle-boundary':
+      return {
+        ...state,
+        boundaryVisibility: {
+          ...state.boundaryVisibility,
+          [action.level]: !state.boundaryVisibility[action.level],
+        },
+      }
+    case 'set-show-labels':
+      return { ...state, showLabels: action.showLabels }
+    case 'set-label-scope':
+      return { ...state, labelScope: action.labelScope }
+    case 'set-label-content-mode':
+      return { ...state, labelContentMode: action.labelContentMode }
+    case 'set-label-size-preset':
+      return {
+        ...state,
+        labelSizePreset: action.labelSizePreset,
+        labelFontSizePx: PRESET_FONT_SIZE_PX[action.labelSizePreset],
+      }
+    case 'set-label-font-size-px':
+      return { ...state, labelFontSizePx: sanitizeLabelFontSizePx(action.labelFontSizePx) }
+    case 'reset-label-font-size':
+      return {
+        ...state,
+        labelFontSizePx: PRESET_FONT_SIZE_PX[state.labelSizePreset] ?? DEFAULT_LABEL_FONT_SIZE_PX,
+      }
+    case 'set-label-halo-enabled':
+      return { ...state, labelHaloEnabled: action.labelHaloEnabled }
+    case 'set-label-hide-on-collision':
+      return { ...state, labelHideOnCollision: action.labelHideOnCollision }
+    case 'set-selected-polygon':
+      return { ...state, selectedPolygon: action.polygon }
+    case 'set-focused-region':
+      return {
+        ...state,
+        focusedRegionId: action.regionId,
+        regionViewMode: 'focused',
+        hoveredPolygon: null,
+        selectedPolygon: null,
+      }
+    case 'clear-focused-region':
+      return {
+        ...state,
+        focusedRegionId: null,
+        regionViewMode: 'overview',
+        hoveredPolygon: null,
+        selectedPolygon: null,
+      }
+    case 'validate-focused-region': {
+      if (!state.focusedRegionId) return state
+      if (action.validRegionIds.includes(state.focusedRegionId)) return state
+      return {
+        ...state,
+        focusedRegionId: null,
+        regionViewMode: 'overview',
+        hoveredPolygon: null,
+        selectedPolygon: null,
+      }
+    }
     default:
       return state
   }
@@ -68,8 +195,38 @@ export function MapProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(mapReducer, undefined, loadInitialMapState)
 
   useEffect(() => {
-    saveJson(MAP_STORAGE_KEY, { ...state, hoveredPolygon: null })
-  }, [state.pluginId, state.datasetId, state.columnKey, state.themeId])
+    saveJson(MAP_STORAGE_KEY, {
+      pluginId: state.pluginId,
+      datasetId: state.datasetId,
+      columnKey: state.columnKey,
+      themeId: state.themeId,
+      boundaryVisibility: state.boundaryVisibility,
+      showLabels: state.showLabels,
+      labelScope: state.labelScope,
+      labelContentMode: state.labelContentMode,
+      labelSizePreset: state.labelSizePreset,
+      labelFontSizePx: state.labelFontSizePx,
+      labelHaloEnabled: state.labelHaloEnabled,
+      labelHideOnCollision: state.labelHideOnCollision,
+      focusedRegionId: state.focusedRegionId,
+      regionViewMode: state.regionViewMode,
+    })
+  }, [
+    state.pluginId,
+    state.datasetId,
+    state.columnKey,
+    state.themeId,
+    state.boundaryVisibility,
+    state.showLabels,
+    state.labelScope,
+    state.labelContentMode,
+    state.labelSizePreset,
+    state.labelFontSizePx,
+    state.labelHaloEnabled,
+    state.labelHideOnCollision,
+    state.focusedRegionId,
+    state.regionViewMode,
+  ])
 
   return (
     <MapStateContext.Provider value={state}>
@@ -101,6 +258,30 @@ export function useMapActions() {
       setHoveredPolygon: (polygon: HoveredPolygon) =>
         dispatch({ type: 'set-hovered-polygon', polygon }),
       clearHoveredPolygon: () => dispatch({ type: 'set-hovered-polygon', polygon: null }),
+      setBoundaryVisibility: (visibility: BoundaryVisibility) =>
+        dispatch({ type: 'set-boundary-visibility', visibility }),
+      toggleBoundary: (level: keyof BoundaryVisibility) =>
+        dispatch({ type: 'toggle-boundary', level }),
+      setShowLabels: (showLabels: boolean) => dispatch({ type: 'set-show-labels', showLabels }),
+      setLabelScope: (labelScope: LabelScope) => dispatch({ type: 'set-label-scope', labelScope }),
+      setLabelContentMode: (labelContentMode: LabelContentMode) =>
+        dispatch({ type: 'set-label-content-mode', labelContentMode }),
+      setLabelSizePreset: (labelSizePreset: LabelSizePreset) =>
+        dispatch({ type: 'set-label-size-preset', labelSizePreset }),
+      setLabelFontSizePx: (labelFontSizePx: number) =>
+        dispatch({ type: 'set-label-font-size-px', labelFontSizePx }),
+      resetLabelFontSize: () => dispatch({ type: 'reset-label-font-size' }),
+      setLabelHaloEnabled: (labelHaloEnabled: boolean) =>
+        dispatch({ type: 'set-label-halo-enabled', labelHaloEnabled }),
+      setLabelHideOnCollision: (labelHideOnCollision: boolean) =>
+        dispatch({ type: 'set-label-hide-on-collision', labelHideOnCollision }),
+      setSelectedPolygon: (polygon: HoveredPolygon | null) =>
+        dispatch({ type: 'set-selected-polygon', polygon }),
+      setFocusedRegion: (regionId: string) =>
+        dispatch({ type: 'set-focused-region', regionId }),
+      clearFocusedRegion: () => dispatch({ type: 'clear-focused-region' }),
+      validateFocusedRegion: (validRegionIds: string[]) =>
+        dispatch({ type: 'validate-focused-region', validRegionIds }),
     }),
     [dispatch],
   )

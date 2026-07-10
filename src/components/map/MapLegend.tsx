@@ -28,12 +28,20 @@ export function MapLegend({ legend }: MapLegendProps) {
             <p className="text-sm text-slate-500">Legenda není k dispozici.</p>
           ) : (
             legend.items.map((item) => (
-              <div key={item.id} className="flex items-center gap-2 text-sm">
+              <div key={item.id} className="flex items-start gap-2 text-sm">
                 <span
-                  className="inline-block h-3 w-3 rounded-sm border border-slate-200"
+                  className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-sm border border-slate-200"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-slate-700">{item.label}</span>
+                <div>
+                  <div className="text-slate-700">{item.label}</div>
+                  {item.subtitle && (
+                    <div className="text-xs text-slate-500">{item.subtitle}</div>
+                  )}
+                  {item.count !== undefined && (
+                    <div className="text-xs text-slate-400">{item.count} pracovišť</div>
+                  )}
+                </div>
               </div>
             ))
           )}

@@ -30,22 +30,35 @@ export const categoricalPlugin: VisualizationPlugin = {
   buildLegend: (context) => {
     const columnKey = context.column?.key
     const labels = new Set<string>()
+    let hasNoData = false
 
     for (const district of context.districts) {
       const record = getRecordForDistrict(context, district.id)
       const raw = columnKey ? record?.values[columnKey] : null
-      if (raw !== null && raw !== undefined && raw !== '') {
+      if (raw === null || raw === undefined || raw === '') {
+        hasNoData = true
+      } else {
         labels.add(String(raw))
       }
     }
 
+    const items = [...labels].sort().map((label) => ({
+      id: label,
+      label,
+      color: colorFromPalette(context.theme.categoricalPalette, label),
+    }))
+
+    if (hasNoData) {
+      items.push({
+        id: '__no_data__',
+        label: 'Bez dat',
+        color: context.theme.noDataFill,
+      })
+    }
+
     return {
       title: context.column?.name ?? 'Kategorie',
-      items: [...labels].sort().map((label) => ({
-        id: label,
-        label,
-        color: colorFromPalette(context.theme.categoricalPalette, label),
-      })),
+      items,
     }
   },
 }

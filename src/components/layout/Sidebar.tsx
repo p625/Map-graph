@@ -7,7 +7,11 @@ const links = [
   { to: '/datasets', label: 'Datasety' },
   { to: '/datasets/wizard', label: 'Import wizard' },
   { to: '/config/districts', label: 'Okresy → Pracoviště' },
+  { to: '/config/district-colors', label: 'Barvy okresů' },
+  { to: '/config/workplace-colors', label: 'Barvy pracovišť' },
   { to: '/config/regional', label: 'Pracoviště → Regiony' },
+  { to: '/config/leaders', label: 'Pracoviště → Vedoucí' },
+  { to: '/organization/sync', label: 'Synchronizace organizace' },
 ]
 
 export function Sidebar() {

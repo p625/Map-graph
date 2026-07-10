@@ -3,15 +3,24 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useRef,
   type Dispatch,
   type ReactNode,
 } from 'react'
 import { migrateDatasetStatus, resolveReadyStatus } from '../domain/dataset/datasetValidation'
 import type { Dataset, DatasetStatus } from '../domain/types/dataset'
 import type { DatasetRecord } from '../domain/types/datasetRecord'
-import { loadJson, saveJson } from '../utils/storage'
+import {
+  estimateJsonBytes,
+  isDatasetStateValid,
+  loadJson,
+  LOCAL_STORAGE_SOFT_LIMIT_BYTES,
+  saveJson,
+} from '../utils/storage'
+import { useNotifications } from './notificationStore'
 
 const DATASET_STORAGE_KEY = 'map-graph-datasets-v2'
+const DATASET_STORAGE_KEY_V1 = 'map-graph-datasets-v1'
 
 interface DatasetState {
   datasets: Dataset[]
@@ -35,11 +44,21 @@ function migrateState(stored: DatasetState): DatasetState {
 }
 
 function loadInitialDatasetState(): DatasetState {
-  const v2 = loadJson<DatasetState | null>(DATASET_STORAGE_KEY, null)
-  if (v2) return migrateState(v2)
+  const v2 = loadJson<unknown>(DATASET_STORAGE_KEY, null)
+  if (isDatasetStateValid(v2) && v2.datasets.length > 0) {
+    return migrateState(v2)
+  }
 
-  const v1 = loadJson<DatasetState | null>('map-graph-datasets-v1', null)
-  if (v1) return migrateState(v1)
+  const v1 = loadJson<unknown>(DATASET_STORAGE_KEY_V1, null)
+  if (isDatasetStateValid(v1) && v1.datasets.length > 0) {
+    const migrated = migrateState(v1)
+    saveJson(DATASET_STORAGE_KEY, migrated)
+    return migrated
+  }
+
+  if (isDatasetStateValid(v2)) {
+    return migrateState(v2)
+  }
 
   return { datasets: [], recordsByDataset: {} }
 }
@@ -113,16 +132,43 @@ function datasetReducer(state: DatasetState, action: DatasetAction): DatasetStat
 const DatasetStateContext = createContext<DatasetState | null>(null)
 const DatasetDispatchContext = createContext<Dispatch<DatasetAction> | null>(null)
 
+function DatasetPersistenceBridge({ state }: { state: DatasetState }) {
+  const { notify } = useNotifications()
+  const warnedRef = useRef(false)
+
+  useEffect(() => {
+    const bytes = estimateJsonBytes(state)
+    if (bytes > LOCAL_STORAGE_SOFT_LIMIT_BYTES && !warnedRef.current) {
+      warnedRef.current = true
+      notify({
+        type: 'warning',
+        title: 'Velký objem dat',
+        message: `Datasety zabírají cca ${(bytes / 1_000_000).toFixed(1)} MB v localStorage. Uložení může selhat.`,
+      })
+    }
+
+    const result = saveJson(DATASET_STORAGE_KEY, state)
+    if (!result.ok && result.error === 'quota') {
+      notify({
+        type: 'error',
+        title: 'Uložení datasetů selhalo',
+        message: 'localStorage je plné. Smažte starší datasety nebo zmenšete import.',
+      })
+    }
+  }, [state, notify])
+
+  return null
+}
+
 export function DatasetProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(datasetReducer, undefined, loadInitialDatasetState)
 
-  useEffect(() => {
-    saveJson(DATASET_STORAGE_KEY, state)
-  }, [state])
-
   return (
     <DatasetStateContext.Provider value={state}>
-      <DatasetDispatchContext.Provider value={dispatch}>{children}</DatasetDispatchContext.Provider>
+      <DatasetDispatchContext.Provider value={dispatch}>
+        <DatasetPersistenceBridge state={state} />
+        {children}
+      </DatasetDispatchContext.Provider>
     </DatasetStateContext.Provider>
   )
 }

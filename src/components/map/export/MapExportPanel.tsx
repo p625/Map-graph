@@ -7,11 +7,24 @@ import {
 } from '../../../domain/export/exportPresets'
 import { exportMapImage, getExportErrorMessage } from '../../../domain/export/exportMapImage'
 import { generateExportFilename } from '../../../domain/export/filenameGenerator'
-import type { LegendSpec } from '../../../domain/visualization/types'
+import type { LabelContentMode, LabelScope } from '../../../domain/labels/labelEngine'
+import type { BoundaryVisibility } from '../../../domain/territory/types'
+import type { ExportMapSizing, MapSizeMode } from '../../../domain/export/exportMapLayout'
+import { BALANCED_EXPORT_MAP_SIZING, DEFAULT_EXPORT_MAP_SIZING } from '../../../domain/export/exportMapLayout'
+import type { ExportMapScope } from '../../../domain/region/types'
+import type { LegendSpec, VisualizationContext } from '../../../domain/visualization/types'
 import type { Dataset } from '../../../domain/types/dataset'
 import type { DatasetColumn } from '../../../domain/types/datasetColumn'
 import type { DistrictColorMap } from '../../../domain/visualization/types'
+import { applyRegionFocusColors, filterLegendForRegion } from '../../../domain/region/regionFocus'
+import type { RegionRenderMode } from '../../../domain/region/regionFocus'
+import { isRegionFocused } from '../../../domain/region/regionScope'
+import { visualizationRegistry } from '../../../domain/visualization/VisualizationRegistry'
+import { useActiveVisualization } from '../../../hooks/useVisualization'
+import { useRegionScope } from '../../../hooks/useRegionScope'
+import { useMapActions, useMapState } from '../../../store/mapStore'
 import { useNotifications } from '../../../store/notificationStore'
+import { TemplateManager } from '../TemplateManager'
 import { ExportMapLayout } from './ExportMapLayout'
 import { MapExportPreview } from './MapExportPreview'
 
@@ -20,15 +33,32 @@ export interface MapExportSettings {
   subtitle: string
   showLegend: boolean
   showDatasetInfo: boolean
+  showLabels: boolean
+  labelScope: LabelScope
+  labelContentMode: LabelContentMode
+  boundaryVisibility: BoundaryVisibility
   presetId: ExportPresetId
   customWidth: number
   customHeight: number
   quality: ExportQuality
+  exportScope: ExportMapScope
+  mapSizeMode: MapSizeMode
+  mapAreaPercent: number
+}
+
+export interface MapTemplateApplyPayload {
+  settings: MapExportSettings
+  pluginId?: string
+  themeId?: string
+  columnKey?: string | null
+  regionFocusEnabled?: boolean
+  focusedRegionId?: string | null
 }
 
 interface MapExportPanelProps {
   colors: DistrictColorMap
   legend: LegendSpec
+  context?: VisualizationContext
   dataset?: Dataset
   column?: DatasetColumn
   pluginName: string
@@ -39,8 +69,9 @@ interface MapExportPanelProps {
 }
 
 export function MapExportPanel({
-  colors,
-  legend,
+  colors: _interactiveColors,
+  legend: _interactiveLegend,
+  context,
   dataset,
   column,
   pluginName,
@@ -49,7 +80,30 @@ export function MapExportPanel({
   defaultTitle,
   defaultSubtitle,
 }: MapExportPanelProps) {
+  const { plugin } = useActiveVisualization()
+  const regionScope = useRegionScope()
   const { notify } = useNotifications()
+  const {
+    showLabels: mapShowLabels,
+    labelScope: mapLabelScope,
+    labelContentMode: mapLabelContentMode,
+    boundaryVisibility: mapBoundaries,
+    pluginId: mapPluginId,
+    themeId: mapThemeId,
+    columnKey: mapColumnKey,
+  } = useMapState()
+  const {
+    setPlugin,
+    setTheme,
+    setColumn,
+    setBoundaryVisibility,
+    setShowLabels,
+    setLabelScope,
+    setLabelContentMode,
+    setFocusedRegion,
+    clearFocusedRegion,
+  } = useMapActions()
+  const { focusedRegionId } = useMapState()
   const canvasRef = useRef<HTMLDivElement>(null)
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -59,10 +113,17 @@ export function MapExportPanel({
     subtitle: defaultSubtitle,
     showLegend: true,
     showDatasetInfo: true,
+    showLabels: mapShowLabels,
+    labelScope: mapLabelScope,
+    labelContentMode: mapLabelContentMode,
+    boundaryVisibility: mapBoundaries,
     presetId: 'presentation-16-9',
     customWidth: 1200,
     customHeight: 800,
     quality: 'standard',
+    exportScope: isRegionFocused(regionScope) ? 'focused-region' : 'country',
+    mapSizeMode: 'maximum',
+    mapAreaPercent: 85,
   })
 
   const dimensions = useMemo(
@@ -115,20 +176,87 @@ export function MapExportPanel({
     }
   }
 
+  const exportRegionMode: RegionRenderMode =
+    settings.exportScope === 'focused-region' && isRegionFocused(regionScope)
+      ? 'export-focused'
+      : 'export-country'
+
+  const exportColors = useMemo(() => {
+    if (!context) return _interactiveColors
+    const activePlugin = visualizationRegistry.getById(mapPluginId) ?? plugin
+    const base = activePlugin.resolveColors(context)
+    return applyRegionFocusColors(base, context.regionScope!, exportRegionMode)
+  }, [context, mapPluginId, plugin, exportRegionMode, _interactiveColors])
+
+  const exportLegend = useMemo(() => {
+    const activePlugin = visualizationRegistry.getById(mapPluginId) ?? plugin
+    if (!context?.regionScope) return _interactiveLegend
+    const base = activePlugin.buildLegend(context)
+    return filterLegendForRegion(base, activePlugin.id, context.regionScope, context)
+  }, [context, mapPluginId, plugin, _interactiveLegend])
+
+  function handleApplyTemplate(payload: MapTemplateApplyPayload) {
+    setSettings(payload.settings)
+    if (payload.pluginId) setPlugin(payload.pluginId)
+    if (payload.themeId) setTheme(payload.themeId)
+    if (payload.columnKey !== undefined) setColumn(payload.columnKey)
+    setBoundaryVisibility(payload.settings.boundaryVisibility)
+    setShowLabels(payload.settings.showLabels)
+    setLabelScope(payload.settings.labelScope)
+    setLabelContentMode(payload.settings.labelContentMode)
+
+    if (payload.regionFocusEnabled === false) {
+      clearFocusedRegion()
+    } else if (payload.focusedRegionId) {
+      const exists = context?.regionalOffices.some((region) => region.id === payload.focusedRegionId)
+      if (exists) {
+        setFocusedRegion(payload.focusedRegionId)
+      } else {
+        clearFocusedRegion()
+        notify({
+          type: 'warning',
+          title: 'Region v šabloně nenalezen',
+          message: 'Šablona odkazovala na neplatný region. Focus byl resetován na celou ČR.',
+        })
+      }
+    }
+  }
+
+  const exportTitle =
+    settings.title ||
+    (exportRegionMode === 'export-focused' && regionScope.regionName
+      ? `${defaultTitle} — ${regionScope.regionName}`
+      : defaultTitle)
+
+  const mapSizing: ExportMapSizing =
+    settings.mapSizeMode === 'balanced'
+      ? BALANCED_EXPORT_MAP_SIZING
+      : settings.mapSizeMode === 'custom'
+        ? { mode: 'custom', mapAreaPercent: settings.mapAreaPercent }
+        : DEFAULT_EXPORT_MAP_SIZING
+
   const layoutProps = {
-    title: settings.title,
+    title: exportTitle,
     subtitle: settings.subtitle,
-    colors,
-    legend,
+    colors: exportColors,
+    legend: exportLegend,
     width: dimensions.width,
     height: dimensions.height,
     showLegend: settings.showLegend,
     showDatasetInfo: settings.showDatasetInfo,
+    showLabels: settings.showLabels,
+    labelScope: settings.labelScope,
+    labelContentMode: settings.labelContentMode,
+    boundaryVisibility: settings.boundaryVisibility,
+    context,
     dataset,
     column,
     pluginName,
     themeName,
     strokeColor,
+    regionScope,
+    regionRenderMode: exportRegionMode,
+    mapSizing,
   }
 
   return (
@@ -179,6 +307,61 @@ export function MapExportPanel({
             <p className="text-xs text-slate-500">{getExportPreset(settings.presetId).description}</p>
           </div>
 
+          <div className="space-y-2 text-sm">
+            <span className="font-medium text-slate-700">Velikost mapy v exportu</span>
+            <select
+              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              value={settings.mapSizeMode}
+              onChange={(e) =>
+                setSettings((s) => ({
+                  ...s,
+                  mapSizeMode: e.target.value as MapSizeMode,
+                }))
+              }
+            >
+              <option value="maximum">Maximum — mapa téměř celá plocha</option>
+              <option value="balanced">Vyvážené — mapa + legenda</option>
+              <option value="custom">Vlastní podíl mapy</option>
+            </select>
+            {settings.mapSizeMode === 'custom' && (
+              <label className="block space-y-1">
+                <span className="text-xs text-slate-600">
+                  Podíl mapy: {settings.mapAreaPercent} %
+                </span>
+                <input
+                  type="range"
+                  min={50}
+                  max={100}
+                  value={settings.mapAreaPercent}
+                  onChange={(e) =>
+                    setSettings((s) => ({
+                      ...s,
+                      mapAreaPercent: Number(e.target.value),
+                    }))
+                  }
+                  className="w-full"
+                />
+              </label>
+            )}
+            <button
+              type="button"
+              className="text-xs text-blue-600 hover:underline"
+              onClick={() =>
+                setSettings((s) => ({
+                  ...s,
+                  mapSizeMode: 'maximum',
+                  mapAreaPercent: 85,
+                  showLegend: false,
+                  showDatasetInfo: false,
+                  title: '',
+                  subtitle: '',
+                }))
+              }
+            >
+              Obnovit doporučené rozložení (map-only)
+            </button>
+          </div>
+
           {settings.presetId === 'custom' && (
             <div className="grid grid-cols-2 gap-3">
               <label className="space-y-1 text-sm">
@@ -211,6 +394,35 @@ export function MapExportPanel({
           )}
 
           <label className="block space-y-1 text-sm">
+            <span className="font-medium text-slate-700">Rozsah exportu</span>
+            <select
+              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              value={settings.exportScope}
+              onChange={(e) =>
+                setSettings((s) => ({
+                  ...s,
+                  exportScope: e.target.value as ExportMapScope,
+                }))
+              }
+            >
+              <option value="country">Celá ČR</option>
+              <option value="focused-region" disabled={!isRegionFocused(regionScope)}>
+                Pouze vybraný region
+              </option>
+            </select>
+            {!isRegionFocused(regionScope) && (
+              <p className="text-xs text-slate-500">
+                Pro export regionu nejprve vyberte region v regionálním focusu.
+              </p>
+            )}
+            {isRegionFocused(regionScope) && focusedRegionId && (
+              <p className="text-xs text-slate-500">
+                Aktivní region: {regionScope.regionName}
+              </p>
+            )}
+          </label>
+
+          <label className="block space-y-1 text-sm">
             <span className="font-medium text-slate-700">Kvalita exportu</span>
             <select
               className="w-full rounded-md border border-slate-300 px-3 py-2"
@@ -241,7 +453,111 @@ export function MapExportPanel({
               />
               <span>Zobrazit info o datasetu</span>
             </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.showLabels}
+                onChange={(e) => setSettings((s) => ({ ...s, showLabels: e.target.checked }))}
+              />
+              <span>Zobrazit popisky na mapě</span>
+            </label>
           </div>
+
+          <div className="space-y-2 text-sm">
+            <span className="font-medium text-slate-700">Popisky</span>
+            <select
+              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              value={settings.labelScope}
+              disabled={!settings.showLabels}
+              onChange={(e) =>
+                setSettings((s) => ({ ...s, labelScope: e.target.value as LabelScope }))
+              }
+            >
+              <option value="none">Bez popisků</option>
+              <option value="workplace">Pracoviště</option>
+              <option value="region">Regiony</option>
+              <option value="district">Okresy</option>
+            </select>
+            {column && (
+              <select
+                className="w-full rounded-md border border-slate-300 px-3 py-2"
+                value={settings.labelContentMode}
+                disabled={!settings.showLabels || settings.labelScope === 'none' || settings.labelScope === 'region'}
+                onChange={(e) =>
+                  setSettings((s) => ({
+                    ...s,
+                    labelContentMode: e.target.value as LabelContentMode,
+                  }))
+                }
+              >
+                <option value="name">Název</option>
+                <option value="value">Hodnota</option>
+                <option value="name-value">Název + hodnota</option>
+              </select>
+            )}
+          </div>
+
+          <div className="space-y-2 text-sm">
+            <span className="font-medium text-slate-700">Hranice ve výstupu</span>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.boundaryVisibility.district}
+                onChange={() =>
+                  setSettings((s) => ({
+                    ...s,
+                    boundaryVisibility: {
+                      ...s.boundaryVisibility,
+                      district: !s.boundaryVisibility.district,
+                    },
+                  }))
+                }
+              />
+              <span>Okresy</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.boundaryVisibility.workplace}
+                onChange={() =>
+                  setSettings((s) => ({
+                    ...s,
+                    boundaryVisibility: {
+                      ...s.boundaryVisibility,
+                      workplace: !s.boundaryVisibility.workplace,
+                    },
+                  }))
+                }
+              />
+              <span>Pracoviště</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.boundaryVisibility.region}
+                onChange={() =>
+                  setSettings((s) => ({
+                    ...s,
+                    boundaryVisibility: {
+                      ...s.boundaryVisibility,
+                      region: !s.boundaryVisibility.region,
+                    },
+                  }))
+                }
+              />
+              <span>Regiony</span>
+            </label>
+          </div>
+
+          <TemplateManager
+            settings={settings}
+            pluginId={mapPluginId}
+            themeId={mapThemeId}
+            columnKey={mapColumnKey}
+            defaultTitle={defaultTitle}
+            defaultSubtitle={defaultSubtitle}
+            onApply={handleApplyTemplate}
+          />
 
           <div className="rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
             Soubor: <span className="font-mono">{filename}</span>

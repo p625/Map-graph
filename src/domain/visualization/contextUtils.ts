@@ -1,4 +1,6 @@
+import type { District } from '../types/district'
 import type { DistrictId, DistrictColorMap, VisualizationContext } from './types'
+import { isRegionFocused } from '../region/regionScope'
 import { NO_DATA_FILL } from './colorUtils'
 
 export function createEmptyColorMap(
@@ -46,4 +48,12 @@ export function getNumericColumnValue(
     return Number.isFinite(parsed) ? parsed : null
   }
   return null
+}
+
+export function getScopedDistricts(context: VisualizationContext): District[] {
+  const scope = context.regionScope
+  if (!scope || !isRegionFocused(scope)) {
+    return context.districts
+  }
+  return context.districts.filter((district) => scope.districtIds.has(district.id))
 }

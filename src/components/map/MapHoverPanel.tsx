@@ -1,14 +1,45 @@
-import { districts } from '../../data/seed/districts'
 import { datasetStatusLabel } from '../../domain/dataset/datasetValidation'
-import { getRecordForDistrict } from '../../domain/visualization/contextUtils'
+import { getNumericColumnValue, getRecordForDistrict } from '../../domain/visualization/contextUtils'
+import type { WorkplaceResolver } from '../../domain/territory/workplaceResolver'
 import { useConfigData } from '../../store/configStore'
+import { isOrganizationSynced } from '../../store/organizationStore'
 import { useMapState } from '../../store/mapStore'
 import { useActiveVisualization } from '../../hooks/useVisualization'
 
-export function MapHoverPanel() {
+function formatHoverValue(
+  raw: unknown,
+  columnType: string | undefined,
+): string {
+  if (raw === null || raw === undefined || raw === '') return '—'
+  if (columnType === 'number' || columnType === 'percent') {
+    const numeric =
+      typeof raw === 'number'
+        ? raw
+        : getNumericColumnValue({ values: { v: raw } }, 'v')
+    if (numeric !== null) {
+      if (columnType === 'percent') {
+        return `${numeric.toLocaleString('cs-CZ', { maximumFractionDigits: 1 })} %`
+      }
+      if (Number.isInteger(numeric)) {
+        return numeric.toLocaleString('cs-CZ')
+      }
+      return numeric.toLocaleString('cs-CZ', { maximumFractionDigits: 2 })
+    }
+  }
+  return String(raw)
+}
+
+export function MapHoverPanel({
+  resolver,
+  districtInteraction = false,
+}: {
+  resolver: WorkplaceResolver
+  districtInteraction?: boolean
+}) {
   const { hoveredPolygon } = useMapState()
-  const { workplaces, regionalOffices } = useConfigData()
-  const { context } = useActiveVisualization()
+  const { context, plugin } = useActiveVisualization()
+  const { organizationSnapshot } = useConfigData()
+  const orgSynced = isOrganizationSynced(organizationSnapshot)
 
   if (!hoveredPolygon) {
     return (
@@ -18,24 +49,39 @@ export function MapHoverPanel() {
     )
   }
 
-  const workplace = workplaces.find((item) => item.id === hoveredPolygon.workplaceId)
+  const workplace = hoveredPolygon.workplaceId
+    ? resolver.getWorkplace(hoveredPolygon.workplaceId)
+    : null
   const districtNames = hoveredPolygon.districtIds.map(
-    (districtId) => districts.find((district) => district.id === districtId)?.name ?? districtId,
+    (districtId) => resolver.getDistrict(districtId)?.name ?? districtId,
   )
   const representativeDistrictId = hoveredPolygon.districtIds[0] ?? null
   const record = representativeDistrictId
     ? getRecordForDistrict(context, representativeDistrictId)
     : null
 
-  const regionalOfficeId = workplace
-    ? context.workplaceRegionalAssignments[workplace.id]
+  const regionalOffice = workplace
+    ? resolver.getRegionForWorkplace(workplace.id)
     : null
-  const regionalOffice = regionalOffices.find((item) => item.id === regionalOfficeId)
+
+  const orgWorkplace = workplace
+    ? organizationSnapshot.workplaces.find((wp) => wp.id === workplace.id)
+    : null
+  const leader = orgWorkplace
+    ? organizationSnapshot.leaders.find((item) => item.id === orgWorkplace.leaderId)
+    : null
+  const orgUnit = orgWorkplace
+    ? organizationSnapshot.orgUnits.find((item) => item.id === orgWorkplace.orgUnitId)
+    : null
+
+  const showDistrictFirst = districtInteraction || plugin.districtInteraction
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <h3 className="text-sm font-semibold text-slate-900">
-        {workplace?.name ?? districtNames[0] ?? 'Neznámá oblast'}
+        {showDistrictFirst
+          ? (districtNames[0] ?? 'Neznámý okres')
+          : (workplace?.name ?? districtNames[0] ?? 'Neznámá oblast')}
       </h3>
       <dl className="mt-3 space-y-2 text-sm text-slate-600">
         {districtNames.length > 0 && (
@@ -56,6 +102,21 @@ export function MapHoverPanel() {
             <dd className="mt-0.5 text-slate-900">{regionalOffice.name}</dd>
           </div>
         )}
+        {orgSynced && leader && (
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Vedoucí</dt>
+            <dd className="mt-0.5 text-slate-900">{leader.name}</dd>
+          </div>
+        )}
+        {orgSynced && orgUnit && (
+          <div>
+            <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Organizační složka</dt>
+            <dd className="mt-0.5 text-slate-900">
+              {orgUnit.designation}
+              {orgUnit.name !== orgUnit.designation ? ` — ${orgUnit.name}` : ''}
+            </dd>
+          </div>
+        )}
         {context.dataset && (
           <div>
             <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Dataset</dt>
@@ -73,7 +134,7 @@ export function MapHoverPanel() {
               {context.column.name}
             </dt>
             <dd className="mt-0.5 text-lg font-semibold text-slate-900">
-              {String(record.values[context.column.key] ?? '—')}
+              {formatHoverValue(record.values[context.column.key], context.column.type)}
             </dd>
           </div>
         )}

@@ -9,7 +9,18 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "import-seed": "tsx scripts/import-seed.ts",
-    "generate-districts": "tsx scripts/generate-districts.ts"
+    "generate-districts": "tsx scripts/generate-districts.ts",
+    "sync-organization": "tsx scripts/sync-organization.ts",
+    "validate-organization-sync": "tsx scripts/validate-organization-sync.ts",
+    "validate-phase-5a": "tsx scripts/validate-phase-5a.ts",
+    "generate-production-test-dataset": "tsx scripts/generate-production-test-dataset.ts",
+    "validate-production-workflow": "tsx scripts/validate-production-workflow.ts",
+    "validate-phase-5c": "tsx scripts/validate-phase-5c.ts",
+    "validate-phase-5c-region": "tsx scripts/validate-phase-5c-region.ts",
+    "validate-phase-5c-assignments": "tsx scripts/validate-phase-5c-assignments.ts",
+    "validate-organization-persistence": "tsx scripts/validate-organization-persistence.ts",
+    "validate-phase-5c-display-export-persistence": "tsx scripts/validate-phase-5c-display-export-persistence.ts",
+    "validate-map-labels": "tsx scripts/validate-map-labels.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.2",

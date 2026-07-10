@@ -12,9 +12,19 @@ export function detectColumnTypes(
   const result: Record<string, 'number' | 'text' | 'percent'> = {}
 
   for (const header of headers) {
+    const headerNormalized = normalizeText(header)
+    if (
+      headerNormalized.includes('podil') ||
+      headerNormalized.includes('procent') ||
+      headerNormalized.includes('percent')
+    ) {
+      result[header] = 'percent'
+      continue
+    }
+
     const values = rows
       .map((row) => row[header] ?? '')
-      .map((value) => value.trim())
+      .map((value) => String(value).trim())
       .filter(Boolean)
 
     if (values.length === 0) {
