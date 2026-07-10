@@ -1,10 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import type { ExportPresetId, ExportQuality, ExportPreset } from '../../../domain/export/exportPresets'
-import {
-  exportPresets,
-  getExportPreset,
-  resolveExportDimensions,
-} from '../../../domain/export/exportPresets'
+import type { ExportPresetId, ExportQuality } from '../../../domain/export/exportPresets'
 import { exportMapImage, getExportErrorMessage } from '../../../domain/export/exportMapImage'
 import { generateExportFilename } from '../../../domain/export/filenameGenerator'
 import type { LabelContentMode, LabelScope } from '../../../domain/labels/labelEngine'
@@ -26,12 +21,14 @@ import { useMapActions, useMapState } from '../../../store/mapStore'
 import { useNotifications } from '../../../store/notificationStore'
 import { TemplateManager } from '../TemplateManager'
 import { ExportMapLayout } from './ExportMapLayout'
+import { ExportPresetControls, resolveExportDimensionsFromPresetKey } from './ExportPresetControls'
 import { MapExportPreview } from './MapExportPreview'
 
 export interface MapExportSettings {
   title: string
   subtitle: string
   showLegend: boolean
+  showOrganizationLegend: boolean
   showDatasetInfo: boolean
   showLabels: boolean
   labelScope: LabelScope
@@ -91,6 +88,8 @@ export function MapExportPanel({
     pluginId: mapPluginId,
     themeId: mapThemeId,
     columnKey: mapColumnKey,
+    organizationLegend,
+    activeExportPresetKey,
   } = useMapState()
   const {
     setPlugin,
@@ -102,6 +101,7 @@ export function MapExportPanel({
     setLabelContentMode,
     setFocusedRegion,
     clearFocusedRegion,
+    setActiveExportPresetKey,
   } = useMapActions()
   const { focusedRegionId } = useMapState()
   const canvasRef = useRef<HTMLDivElement>(null)
@@ -112,6 +112,7 @@ export function MapExportPanel({
     title: defaultTitle,
     subtitle: defaultSubtitle,
     showLegend: true,
+    showOrganizationLegend: organizationLegend.enabled,
     showDatasetInfo: true,
     showLabels: mapShowLabels,
     labelScope: mapLabelScope,
@@ -127,8 +128,8 @@ export function MapExportPanel({
   })
 
   const dimensions = useMemo(
-    () => resolveExportDimensions(settings.presetId, settings.customWidth, settings.customHeight),
-    [settings.presetId, settings.customWidth, settings.customHeight],
+    () => resolveExportDimensionsFromPresetKey(activeExportPresetKey, settings),
+    [activeExportPresetKey, settings],
   )
 
   const filename = useMemo(
@@ -243,6 +244,7 @@ export function MapExportPanel({
     width: dimensions.width,
     height: dimensions.height,
     showLegend: settings.showLegend,
+    showOrganizationLegend: settings.showOrganizationLegend,
     showDatasetInfo: settings.showDatasetInfo,
     showLabels: settings.showLabels,
     labelScope: settings.labelScope,
@@ -257,6 +259,7 @@ export function MapExportPanel({
     regionScope,
     regionRenderMode: exportRegionMode,
     mapSizing,
+    organizationLegendSettings: organizationLegend,
   }
 
   return (
@@ -289,23 +292,15 @@ export function MapExportPanel({
             />
           </label>
 
-          <div className="space-y-2 text-sm">
-            <span className="font-medium text-slate-700">Velikost výstupu</span>
-            <select
-              className="w-full rounded-md border border-slate-300 px-3 py-2"
-              value={settings.presetId}
-              onChange={(e) =>
-                setSettings((s) => ({ ...s, presetId: e.target.value as ExportPresetId }))
-              }
-            >
-              {exportPresets.map((preset: ExportPreset) => (
-                <option key={preset.id} value={preset.id}>
-                  {preset.name} ({preset.width}×{preset.height})
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-slate-500">{getExportPreset(settings.presetId).description}</p>
-          </div>
+          <ExportPresetControls
+            selectedPresetKey={activeExportPresetKey}
+            settings={settings}
+            onPresetKeyChange={setActiveExportPresetKey}
+            onSelectPreset={(key, nextSettings) => {
+              setActiveExportPresetKey(key)
+              setSettings(nextSettings)
+            }}
+          />
 
           <div className="space-y-2 text-sm">
             <span className="font-medium text-slate-700">Velikost mapy v exportu</span>
@@ -444,6 +439,16 @@ export function MapExportPanel({
                 onChange={(e) => setSettings((s) => ({ ...s, showLegend: e.target.checked }))}
               />
               <span>Zobrazit legendu</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.showOrganizationLegend}
+                onChange={(e) =>
+                  setSettings((s) => ({ ...s, showOrganizationLegend: e.target.checked }))
+                }
+              />
+              <span>Zobrazit organizační legendu</span>
             </label>
             <label className="flex items-center gap-2">
               <input

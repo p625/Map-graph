@@ -10,6 +10,7 @@ import { getInteractiveDistrictIds } from '../domain/region/regionFocus'
 import { isRegionFocused } from '../domain/region/regionScope'
 import { useActiveVisualization } from '../hooks/useVisualization'
 import { useMapRenderModel } from '../hooks/useMapRenderModel'
+import { useOrganizationLegendItems } from '../hooks/useOrganizationLegend'
 import { useRegionScope, useValidateFocusedRegion } from '../hooks/useRegionScope'
 import { useMapActions, useMapState } from '../store/mapStore'
 import { cn } from '../utils/cn'
@@ -27,9 +28,12 @@ export function MapPage() {
     labelContentMode,
     hoveredPolygon,
     selectedPolygon,
+    organizationLegend,
   } = useMapState()
   const { setHoveredPolygon, clearHoveredPolygon, setSelectedPolygon } = useMapActions()
   const [viewMode, setViewMode] = useState<MapViewMode>('interactive')
+
+  const organizationLegendItems = useOrganizationLegendItems(organizationLegend)
 
   const mapWidth = 760
   const mapHeight = 460
@@ -159,6 +163,8 @@ export function MapPage() {
             fillStyles={fillStyles}
             boundaryLayers={boundaryLayers}
             labels={labels}
+            organizationLegendItems={organizationLegendItems}
+            organizationLegendSettings={organizationLegend}
             resolver={resolver}
             width={mapWidth}
             height={mapHeight}

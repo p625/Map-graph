@@ -20,7 +20,8 @@
     "validate-phase-5c-assignments": "tsx scripts/validate-phase-5c-assignments.ts",
     "validate-organization-persistence": "tsx scripts/validate-organization-persistence.ts",
     "validate-phase-5c-display-export-persistence": "tsx scripts/validate-phase-5c-display-export-persistence.ts",
-    "validate-map-labels": "tsx scripts/validate-map-labels.ts"
+    "validate-map-labels": "tsx scripts/validate-map-labels.ts",
+    "validate-phase-5c-region-colors-org-legend-export-presets": "tsx scripts/validate-phase-5c-region-colors-org-legend-export-presets.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.2",

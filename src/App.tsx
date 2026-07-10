@@ -4,6 +4,7 @@ import { ConfigDistrictAssignmentsPage } from './pages/ConfigDistrictAssignments
 import { ConfigDistrictColorsPage } from './pages/ConfigDistrictColorsPage'
 import { ConfigWorkplaceColorsPage } from './pages/ConfigWorkplaceColorsPage'
 import { ConfigLeaderAssignmentsPage } from './pages/ConfigLeaderAssignmentsPage'
+import { ConfigRegionalColorsPage } from './pages/ConfigRegionalColorsPage'
 import { ConfigRegionalAssignmentsPage } from './pages/ConfigRegionalAssignmentsPage'
 import { DatasetListPage } from './pages/DatasetListPage'
 import { DatasetWizardPage } from './pages/DatasetWizardPage'
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/config/districts" element={<ConfigDistrictAssignmentsPage />} />
         <Route path="/config/district-colors" element={<ConfigDistrictColorsPage />} />
         <Route path="/config/workplace-colors" element={<ConfigWorkplaceColorsPage />} />
+        <Route path="/config/regional-colors" element={<ConfigRegionalColorsPage />} />
         <Route path="/config/regional" element={<ConfigRegionalAssignmentsPage />} />
         <Route path="/config/leaders" element={<ConfigLeaderAssignmentsPage />} />
         <Route path="/organization/sync" element={<OrganizationSyncPage />} />

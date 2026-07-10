@@ -1,5 +1,5 @@
+import { resolveRegionDisplayColor } from '../../color/regionDisplayColors'
 import type { VisualizationPlugin } from '../types'
-import { colorFromPalette } from '../colorUtils'
 import {
   createEmptyColorMap,
   getRegionalOfficeForWorkplace,
@@ -15,7 +15,7 @@ export const byRegionalOfficePlugin: VisualizationPlugin = {
   supportsColumn: () => false,
   resolveColors: (context) => {
     const colors = createEmptyColorMap(context)
-    const palette = context.theme.regionalPalette
+    const overrides = context.regionDisplayColors ?? {}
 
     for (const district of context.districts) {
       const workplaceId = getWorkplaceForDistrict(context, district.id)
@@ -26,18 +26,25 @@ export const byRegionalOfficePlugin: VisualizationPlugin = {
 
       const office = context.regionalOffices.find((item) => item.id === regionalOfficeId)
       colors[district.id] = {
-        fill: colorFromPalette(palette, office?.name ?? regionalOfficeId),
+        fill: resolveRegionDisplayColor(
+          regionalOfficeId,
+          office?.name ?? regionalOfficeId,
+          overrides,
+        ),
       }
     }
 
     return colors
   },
-  buildLegend: (context) => ({
-    title: 'Regionální odbory',
-    items: context.regionalOffices.map((office) => ({
-      id: office.id,
-      label: office.name,
-      color: colorFromPalette(context.theme.regionalPalette, office.name),
-    })),
-  }),
+  buildLegend: (context) => {
+    const overrides = context.regionDisplayColors ?? {}
+    return {
+      title: 'Regionální odbory',
+      items: context.regionalOffices.map((office) => ({
+        id: office.id,
+        label: office.name,
+        color: resolveRegionDisplayColor(office.id, office.name, overrides),
+      })),
+    }
+  },
 }

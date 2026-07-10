@@ -1,14 +1,18 @@
 import { forwardRef, useMemo } from 'react'
 import type { LayeredBoundaryStrokes } from '../../domain/color/colorEngine'
 import type { MapLabel } from '../../domain/labels/labelEngine'
+import type { OrganizationLegendItem, OrganizationLegendSettings } from '../../domain/organization/organizationLegend'
 import type { TerritoryFillMap, TerritoryLayers } from '../../domain/territory/types'
 import type { WorkplaceResolver } from '../../domain/territory/workplaceResolver'
+import { OrganizationMapLegend } from './OrganizationMapLegend'
 
 export interface CzechMapProps {
   territories: TerritoryLayers
   fillStyles: TerritoryFillMap
   boundaryLayers: LayeredBoundaryStrokes
   labels?: MapLabel[]
+  organizationLegendItems?: OrganizationLegendItem[]
+  organizationLegendSettings?: OrganizationLegendSettings
   resolver: WorkplaceResolver
   interactive?: boolean
   width?: number
@@ -46,6 +50,8 @@ export const CzechMap = forwardRef<HTMLDivElement, CzechMapProps>(function Czech
     fillStyles,
     boundaryLayers,
     labels = [],
+    organizationLegendItems = [],
+    organizationLegendSettings,
     resolver,
     interactive = true,
     width = 760,
@@ -170,6 +176,16 @@ export const CzechMap = forwardRef<HTMLDivElement, CzechMapProps>(function Czech
               )
             })}
           </g>
+        )}
+
+        {organizationLegendSettings && (
+          <OrganizationMapLegend
+            items={organizationLegendItems}
+            settings={organizationLegendSettings}
+            viewBox={viewBox}
+            mapWidth={width}
+            mapHeight={height}
+          />
         )}
       </svg>
     </div>

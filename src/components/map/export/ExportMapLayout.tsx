@@ -7,8 +7,11 @@ import type { Dataset } from '../../../domain/types/dataset'
 import type { DatasetColumn } from '../../../domain/types/datasetColumn'
 import type { RegionScope } from '../../../domain/region/types'
 import type { RegionRenderMode } from '../../../domain/region/regionFocus'
+import type { OrganizationLegendItem, OrganizationLegendSettings } from '../../../domain/organization/organizationLegend'
+import { buildOrganizationLegendItems } from '../../../domain/organization/organizationLegend'
 import type { DistrictColorMap, LegendSpec, VisualizationContext } from '../../../domain/visualization/types'
 import { useMapRenderModel } from '../../../hooks/useMapRenderModel'
+import { isOrganizationSynced, useOrganizationSnapshot } from '../../../store/organizationStore'
 import { CzechMap } from '../CzechMap'
 import { ExportMapLegend } from './ExportMapLegend'
 
@@ -35,6 +38,8 @@ export interface ExportMapLayoutProps {
   regionScope?: RegionScope
   regionRenderMode?: RegionRenderMode
   mapSizing?: ExportMapSizing
+  showOrganizationLegend?: boolean
+  organizationLegendSettings?: OrganizationLegendSettings
 }
 
 export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
@@ -62,6 +67,8 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
       regionScope,
       regionRenderMode = 'export-country',
       mapSizing,
+      showOrganizationLegend = false,
+      organizationLegendSettings,
     },
     ref,
   ) {
@@ -102,6 +109,25 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
       regionScope,
       regionRenderMode,
     })
+
+    const snapshot = useOrganizationSnapshot()
+    const orgLegendItems: OrganizationLegendItem[] =
+      showOrganizationLegend &&
+      organizationLegendSettings &&
+      isOrganizationSynced(snapshot)
+        ? buildOrganizationLegendItems({
+            leaders: snapshot.leaders,
+            orgUnits: snapshot.orgUnits,
+            workplaces: snapshot.workplaces,
+            regionScope,
+            maxItems: organizationLegendSettings.maxItems,
+          })
+        : []
+
+    const orgLegendConfig: OrganizationLegendSettings | undefined =
+      showOrganizationLegend && organizationLegendSettings
+        ? { ...organizationLegendSettings, enabled: true }
+        : undefined
 
     return (
       <div
@@ -175,6 +201,8 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
               fillStyles={fillStyles}
               boundaryLayers={boundaryLayers}
               labels={labels}
+              organizationLegendItems={orgLegendItems}
+              organizationLegendSettings={orgLegendConfig}
               resolver={resolver}
               interactive={false}
               width={mapWidth}

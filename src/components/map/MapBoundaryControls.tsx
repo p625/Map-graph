@@ -1,4 +1,5 @@
 import type { LabelContentMode, LabelScope, LabelSizePreset } from '../../domain/labels/labelEngine'
+import type { OrganizationLegendLabelMode } from '../../domain/organization/organizationLegend'
 import {
   LABEL_FONT_SIZE_MAX,
   LABEL_FONT_SIZE_MIN,
@@ -35,6 +36,7 @@ export function MapBoundaryControls({ hasDataColumn = false }: { hasDataColumn?:
     labelFontSizePx,
     labelHaloEnabled,
     labelHideOnCollision,
+    organizationLegend,
   } = useMapState()
   const {
     toggleBoundary,
@@ -46,7 +48,17 @@ export function MapBoundaryControls({ hasDataColumn = false }: { hasDataColumn?:
     resetLabelFontSize,
     setLabelHaloEnabled,
     setLabelHideOnCollision,
+    setOrganizationLegendEnabled,
+    setOrganizationLegendLabelMode,
+    updateOrganizationLegend,
   } = useMapActions()
+
+  const orgLegendLabelModes: { value: OrganizationLegendLabelMode; label: string }[] = [
+    { value: 'leader', label: 'Vedoucí' },
+    { value: 'org-unit', label: 'Organizační složka' },
+    { value: 'leader-org-unit', label: 'Vedoucí + organizační složka' },
+    { value: 'none', label: 'Pouze barva' },
+  ]
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -191,6 +203,46 @@ export function MapBoundaryControls({ hasDataColumn = false }: { hasDataColumn?:
             </select>
           </label>
         )}
+      </div>
+
+      <div className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
+        <h4 className="font-medium text-slate-700">Organizační legenda v mapě</h4>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={organizationLegend.enabled}
+            onChange={(event) => setOrganizationLegendEnabled(event.target.checked)}
+          />
+          <span>Zobrazit organizační legendu</span>
+        </label>
+        <label className="block space-y-1">
+          <span className="font-medium text-slate-700">Text legendy</span>
+          <select
+            className="w-full rounded-md border border-slate-300 px-3 py-2"
+            value={organizationLegend.labelMode}
+            disabled={!organizationLegend.enabled}
+            onChange={(event) =>
+              setOrganizationLegendLabelMode(event.target.value as OrganizationLegendLabelMode)
+            }
+          >
+            {orgLegendLabelModes.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={organizationLegend.showWorkplaceCount}
+            disabled={!organizationLegend.enabled}
+            onChange={(event) =>
+              updateOrganizationLegend({ showWorkplaceCount: event.target.checked })
+            }
+          />
+          <span>Zobrazit počet pracovišť</span>
+        </label>
       </div>
     </div>
   )

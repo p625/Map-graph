@@ -49,6 +49,7 @@ export interface VisualizationContext {
   workplaceRegionalAssignments: WorkplaceRegionalAssignments
   districtDisplayColors?: Record<string, string>
   workplaceDisplayColors?: Record<string, string>
+  regionDisplayColors?: Record<string, string>
   organization?: {
     leaders: Leader[]
     orgUnits: OrgUnit[]

@@ -32,6 +32,7 @@ export interface ConfigState {
   workplaceRegionalAssignments: WorkplaceRegionalAssignments
   districtDisplayColors: Record<string, string>
   workplaceDisplayColors: Record<string, string>
+  regionDisplayColors: Record<string, string>
 }
 
 interface HistoryState {
@@ -49,6 +50,9 @@ export type ConfigAction =
   | { type: 'set-workplace-color'; workplaceId: string; color: string }
   | { type: 'reset-workplace-color'; workplaceId: string }
   | { type: 'reset-all-workplace-colors' }
+  | { type: 'set-region-color'; regionId: string; color: string }
+  | { type: 'reset-region-color'; regionId: string }
+  | { type: 'reset-all-region-colors' }
   | {
       type: 'apply-organization-sync'
       districtWorkplaceAssignments: DistrictWorkplaceAssignments
@@ -74,6 +78,7 @@ function cloneConfig(state: ConfigState): ConfigState {
     workplaceRegionalAssignments: { ...state.workplaceRegionalAssignments },
     districtDisplayColors: { ...state.districtDisplayColors },
     workplaceDisplayColors: { ...state.workplaceDisplayColors },
+    regionDisplayColors: { ...state.regionDisplayColors },
   }
 }
 
@@ -84,6 +89,7 @@ function normalizeConfigState(stored: Partial<ConfigState> | null): ConfigState 
       workplaceRegionalAssignments: {},
       districtDisplayColors: {},
       workplaceDisplayColors: {},
+      regionDisplayColors: {},
     }
   }
   return {
@@ -93,6 +99,7 @@ function normalizeConfigState(stored: Partial<ConfigState> | null): ConfigState 
     workplaceRegionalAssignments: stored.workplaceRegionalAssignments ?? {},
     districtDisplayColors: stored.districtDisplayColors ?? {},
     workplaceDisplayColors: stored.workplaceDisplayColors ?? {},
+    regionDisplayColors: stored.regionDisplayColors ?? {},
   }
 }
 
@@ -151,6 +158,19 @@ function applyConfigAction(state: ConfigState, action: ConfigAction): ConfigStat
     }
     case 'reset-all-workplace-colors':
       return { ...state, workplaceDisplayColors: {} }
+    case 'set-region-color': {
+      const color = sanitizeMapColor(action.color)
+      if (!color) return state
+      const next = { ...state.regionDisplayColors, [action.regionId]: color }
+      return { ...state, regionDisplayColors: next }
+    }
+    case 'reset-region-color': {
+      const next = { ...state.regionDisplayColors }
+      delete next[action.regionId]
+      return { ...state, regionDisplayColors: next }
+    }
+    case 'reset-all-region-colors':
+      return { ...state, regionDisplayColors: {} }
     case 'reset-default-assignments':
       return {
         ...state,
@@ -162,6 +182,7 @@ function applyConfigAction(state: ConfigState, action: ConfigAction): ConfigStat
         workplaceRegionalAssignments: { ...action.workplaceRegionalAssignments },
         districtDisplayColors: { ...state.districtDisplayColors },
         workplaceDisplayColors: { ...state.workplaceDisplayColors },
+        regionDisplayColors: { ...state.regionDisplayColors },
       }
     case 'sync-derived-organization-assignments':
       return {

@@ -9,6 +9,7 @@ const links = [
   { to: '/config/districts', label: 'Okresy → Pracoviště' },
   { to: '/config/district-colors', label: 'Barvy okresů' },
   { to: '/config/workplace-colors', label: 'Barvy pracovišť' },
+  { to: '/config/regional-colors', label: 'Barvy regionů' },
   { to: '/config/regional', label: 'Pracoviště → Regiony' },
   { to: '/config/leaders', label: 'Pracoviště → Vedoucí' },
   { to: '/organization/sync', label: 'Synchronizace organizace' },

@@ -10,6 +10,11 @@ import {
 import { defaultThemeId } from '../domain/visualization/themes'
 import type { LabelContentMode, LabelScope, LabelSizePreset } from '../domain/labels/labelEngine'
 import {
+  DEFAULT_ORGANIZATION_LEGEND_SETTINGS,
+  type OrganizationLegendLabelMode,
+  type OrganizationLegendSettings,
+} from '../domain/organization/organizationLegend'
+import {
   DEFAULT_LABEL_FONT_SIZE_PX,
   PRESET_FONT_SIZE_PX,
   sanitizeLabelFontSizePx,
@@ -38,6 +43,8 @@ interface MapState {
   labelFontSizePx: number
   labelHaloEnabled: boolean
   labelHideOnCollision: boolean
+  organizationLegend: OrganizationLegendSettings
+  activeExportPresetKey: string
   selectedPolygon: HoveredPolygon | null
   focusedRegionId: string | null
   regionViewMode: RegionViewMode
@@ -59,6 +66,9 @@ type MapAction =
   | { type: 'reset-label-font-size' }
   | { type: 'set-label-halo-enabled'; labelHaloEnabled: boolean }
   | { type: 'set-label-hide-on-collision'; labelHideOnCollision: boolean }
+  | { type: 'set-organization-legend'; organizationLegend: OrganizationLegendSettings }
+  | { type: 'update-organization-legend'; patch: Partial<OrganizationLegendSettings> }
+  | { type: 'set-active-export-preset-key'; activeExportPresetKey: string }
   | { type: 'set-selected-polygon'; polygon: HoveredPolygon | null }
   | { type: 'set-focused-region'; regionId: string }
   | { type: 'clear-focused-region' }
@@ -80,6 +90,8 @@ const initialState: MapState = {
   labelFontSizePx: PRESET_FONT_SIZE_PX.small,
   labelHaloEnabled: false,
   labelHideOnCollision: false,
+  organizationLegend: DEFAULT_ORGANIZATION_LEGEND_SETTINGS,
+  activeExportPresetKey: 'presentation-16-9',
   selectedPolygon: null,
   focusedRegionId: null,
   regionViewMode: 'overview',
@@ -104,6 +116,12 @@ function loadInitialMapState(): MapState {
     ),
     labelHaloEnabled: stored.labelHaloEnabled ?? false,
     labelHideOnCollision: stored.labelHideOnCollision ?? false,
+    organizationLegend: {
+      ...DEFAULT_ORGANIZATION_LEGEND_SETTINGS,
+      ...(stored.organizationLegend ?? {}),
+      position: 'top-right',
+    },
+    activeExportPresetKey: stored.activeExportPresetKey ?? 'presentation-16-9',
     focusedRegionId: stored.focusedRegionId ?? null,
     regionViewMode: stored.regionViewMode ?? 'overview',
   }
@@ -154,6 +172,22 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       return { ...state, labelHaloEnabled: action.labelHaloEnabled }
     case 'set-label-hide-on-collision':
       return { ...state, labelHideOnCollision: action.labelHideOnCollision }
+    case 'set-organization-legend':
+      return {
+        ...state,
+        organizationLegend: { ...action.organizationLegend, position: 'top-right' },
+      }
+    case 'update-organization-legend':
+      return {
+        ...state,
+        organizationLegend: {
+          ...state.organizationLegend,
+          ...action.patch,
+          position: 'top-right',
+        },
+      }
+    case 'set-active-export-preset-key':
+      return { ...state, activeExportPresetKey: action.activeExportPresetKey }
     case 'set-selected-polygon':
       return { ...state, selectedPolygon: action.polygon }
     case 'set-focused-region':
@@ -208,6 +242,8 @@ export function MapProvider({ children }: { children: ReactNode }) {
       labelFontSizePx: state.labelFontSizePx,
       labelHaloEnabled: state.labelHaloEnabled,
       labelHideOnCollision: state.labelHideOnCollision,
+      organizationLegend: state.organizationLegend,
+      activeExportPresetKey: state.activeExportPresetKey,
       focusedRegionId: state.focusedRegionId,
       regionViewMode: state.regionViewMode,
     })
@@ -224,6 +260,8 @@ export function MapProvider({ children }: { children: ReactNode }) {
     state.labelFontSizePx,
     state.labelHaloEnabled,
     state.labelHideOnCollision,
+    state.organizationLegend,
+    state.activeExportPresetKey,
     state.focusedRegionId,
     state.regionViewMode,
   ])
@@ -275,6 +313,16 @@ export function useMapActions() {
         dispatch({ type: 'set-label-halo-enabled', labelHaloEnabled }),
       setLabelHideOnCollision: (labelHideOnCollision: boolean) =>
         dispatch({ type: 'set-label-hide-on-collision', labelHideOnCollision }),
+      setOrganizationLegend: (organizationLegend: OrganizationLegendSettings) =>
+        dispatch({ type: 'set-organization-legend', organizationLegend }),
+      updateOrganizationLegend: (patch: Partial<OrganizationLegendSettings>) =>
+        dispatch({ type: 'update-organization-legend', patch }),
+      setOrganizationLegendEnabled: (enabled: boolean) =>
+        dispatch({ type: 'update-organization-legend', patch: { enabled } }),
+      setOrganizationLegendLabelMode: (labelMode: OrganizationLegendLabelMode) =>
+        dispatch({ type: 'update-organization-legend', patch: { labelMode } }),
+      setActiveExportPresetKey: (activeExportPresetKey: string) =>
+        dispatch({ type: 'set-active-export-preset-key', activeExportPresetKey }),
       setSelectedPolygon: (polygon: HoveredPolygon | null) =>
         dispatch({ type: 'set-selected-polygon', polygon }),
       setFocusedRegion: (regionId: string) =>

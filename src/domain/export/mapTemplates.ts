@@ -22,6 +22,7 @@ export interface MapTemplate {
   regionFocusEnabled?: boolean
   focusedRegionId?: string | null
   exportScope?: ExportMapScope
+  exportPresetId?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -45,6 +46,7 @@ export const DEFAULT_MAP_TEMPLATE: Omit<MapTemplate, 'id' | 'createdAt' | 'updat
   labelContentMode: 'name',
   boundaryVisibility: DEFAULT_BOUNDARY_VISIBILITY,
   exportScope: 'country',
+  exportPresetId: null,
   regionFocusEnabled: false,
   focusedRegionId: null,
 }
@@ -69,6 +71,7 @@ export function loadMapTemplates(): MapTemplate[] {
           ...(item.boundaryVisibility ?? {}),
         },
         labelContentMode: item.labelContentMode ?? 'name',
+        exportPresetId: item.exportPresetId ?? null,
       }))
   } catch {
     return []

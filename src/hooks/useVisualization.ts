@@ -29,6 +29,7 @@ export function useVisualizationContext(): VisualizationContext {
       workplaceRegionalAssignments: config.workplaceRegionalAssignments,
       districtDisplayColors: config.districtDisplayColors,
       workplaceDisplayColors: config.workplaceDisplayColors,
+      regionDisplayColors: config.regionDisplayColors,
       organization: orgSynced
         ? {
             leaders: organizationSnapshot.leaders,

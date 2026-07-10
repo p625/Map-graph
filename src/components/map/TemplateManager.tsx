@@ -28,6 +28,7 @@ function templateToPayload(
       title: resolved.title,
       subtitle: resolved.subtitle,
       showLegend: resolved.showLegend,
+      showOrganizationLegend: false,
       showDatasetInfo: resolved.showDatasetInfo,
       showLabels: resolved.showLabels,
       labelScope: resolved.labelScope,
