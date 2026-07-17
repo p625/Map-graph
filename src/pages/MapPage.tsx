@@ -22,6 +22,7 @@ import { useMapRenderModel } from '../hooks/useMapRenderModel'
 import { useOrganizationLegendItems } from '../hooks/useOrganizationLegend'
 import { useRegionScope, useValidateFocusedRegion } from '../hooks/useRegionScope'
 import { useMapActions, useMapState } from '../store/mapStore'
+import { useSupervisionPlan } from '../store/supervisionPlanStore'
 import { useRegionLabelOverrides } from '../store/regionLabelOverridesStore'
 import { useWorkplaceLabelOverrides } from '../store/workplaceLabelOverridesStore'
 import { cn } from '../utils/cn'
@@ -55,6 +56,7 @@ export function MapPage() {
     regionLabelEditMode,
     editorView,
     hoveredPolygon: currentHover,
+    supervisionYearFilter,
   } = useMapState()
   const {
     setHoveredPolygon,
@@ -76,6 +78,7 @@ export function MapPage() {
   const [viewMode, setViewMode] = useState<MapViewMode>('interactive')
 
   const organizationLegendItems = useOrganizationLegendItems(organizationLegend)
+  const supervisionPlan = useSupervisionPlan()
 
   const mapWidth = MAP_LOGICAL_WIDTH
   const mapHeight = MAP_LOGICAL_HEIGHT
@@ -115,12 +118,18 @@ export function MapPage() {
   )
 
   const defaultTitle = useMemo(() => {
+    if (plugin.id === 'supervision-plan') {
+      if (typeof supervisionYearFilter === 'number') {
+        return `${supervisionPlan.name} — rok ${supervisionYearFilter}`
+      }
+      return supervisionPlan.name
+    }
     if (context.dataset && context.column) {
       return `${context.dataset.name} — ${context.column.name}`
     }
     if (context.dataset) return context.dataset.name
     return plugin.name
-  }, [context.dataset, context.column, plugin.name])
+  }, [context.dataset, context.column, plugin.id, plugin.name, supervisionPlan.name, supervisionYearFilter])
 
   const defaultSubtitle = useMemo(() => {
     const parts: string[] = [plugin.name]

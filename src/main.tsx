@@ -10,6 +10,7 @@ import { RegionLabelOverridesProvider } from './store/regionLabelOverridesStore.
 import { WorkplaceLabelOverridesProvider } from './store/workplaceLabelOverridesStore.tsx'
 import { NotificationProvider } from './store/notificationStore.tsx'
 import { OrganizationProvider } from './store/organizationStore.tsx'
+import { SupervisionPlanProvider } from './store/supervisionPlanStore.tsx'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -17,18 +18,20 @@ createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <NotificationProvider>
         <OrganizationProvider>
-          <ConfigProvider>
-            <AssignmentConfigBridge />
-            <DatasetProvider>
-              <MapProvider>
-                <RegionLabelOverridesProvider>
-                  <WorkplaceLabelOverridesProvider>
-                    <App />
-                  </WorkplaceLabelOverridesProvider>
-                </RegionLabelOverridesProvider>
-              </MapProvider>
-            </DatasetProvider>
-          </ConfigProvider>
+          <SupervisionPlanProvider>
+            <ConfigProvider>
+              <AssignmentConfigBridge />
+              <DatasetProvider>
+                <MapProvider>
+                  <RegionLabelOverridesProvider>
+                    <WorkplaceLabelOverridesProvider>
+                      <App />
+                    </WorkplaceLabelOverridesProvider>
+                  </RegionLabelOverridesProvider>
+                </MapProvider>
+              </DatasetProvider>
+            </ConfigProvider>
+          </SupervisionPlanProvider>
         </OrganizationProvider>
       </NotificationProvider>
     </BrowserRouter>

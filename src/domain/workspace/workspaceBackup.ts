@@ -1,6 +1,7 @@
 import { loadJson, saveJson } from '../../utils/storage'
 import { REGION_LABEL_OVERRIDES_KEY } from '../labels/regionLabelOverrides'
 import { WORKPLACE_LABEL_OVERRIDES_KEY } from '../labels/workplaceLabelOverrides'
+import { SUPERVISION_PLAN_STORAGE_KEY } from '../supervision-plan/types'
 
 export const WORKSPACE_BACKUP_VERSION = 1
 
@@ -11,6 +12,7 @@ export const WORKSPACE_MODULE_KEYS = {
   map: 'map-graph-map-v3',
   workplaceLabelOverrides: WORKPLACE_LABEL_OVERRIDES_KEY,
   regionLabelOverrides: REGION_LABEL_OVERRIDES_KEY,
+  supervisionPlan: SUPERVISION_PLAN_STORAGE_KEY,
   templates: 'map-graph-templates-v1',
   exportPresets: 'map-graph-export-presets-v1',
 } as const

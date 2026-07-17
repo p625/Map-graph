@@ -10,6 +10,7 @@ import { DatasetEditorPage } from './pages/DatasetEditorPage'
 import { DatasetListPage } from './pages/DatasetListPage'
 import { DatasetWizardPage } from './pages/DatasetWizardPage'
 import { MapPage } from './pages/MapPage'
+import { SupervisionPlanPage } from './pages/SupervisionPlanPage'
 import { OrganizationSyncPage } from './pages/OrganizationSyncPage'
 import { ProjectDashboardPage } from './pages/ProjectDashboardPage'
 import { WorkspaceSettingsPage } from './pages/WorkspaceSettingsPage'
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<ProjectDashboardPage />} />
         <Route path="/map" element={<MapPage />} />
+        <Route path="/supervision-plan" element={<SupervisionPlanPage />} />
         <Route path="/datasets" element={<DatasetListPage />} />
         <Route path="/datasets/:datasetId/edit" element={<DatasetEditorPage />} />
         <Route path="/datasets/wizard" element={<DatasetWizardPage />} />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { LabelContentMode, LabelSizePreset } from '../../domain/labels/labelEngine'
 import {
   DISTRICT_FONT_MAX,
@@ -16,10 +16,16 @@ import { useMapActions, useMapState } from '../../store/mapStore'
 import { useRegionLabelOverrides } from '../../store/regionLabelOverridesStore'
 import { useWorkplaceLabelOverrides } from '../../store/workplaceLabelOverridesStore'
 
-const labelContentOptions: { value: LabelContentMode; label: string }[] = [
+const defaultLabelContentOptions: { value: LabelContentMode; label: string }[] = [
   { value: 'name', label: 'Název' },
   { value: 'value', label: 'Hodnota' },
   { value: 'name-value', label: 'Název + hodnota' },
+]
+
+const supervisionLabelContentOptions: { value: LabelContentMode; label: string }[] = [
+  { value: 'name', label: 'Název' },
+  { value: 'supervision-year', label: 'Rok supervize' },
+  { value: 'supervision-name-year', label: 'Název + rok' },
 ]
 
 const labelSizeOptions: { value: LabelSizePreset; label: string }[] = [
@@ -135,6 +141,7 @@ function HaloControls({
 
 export function MapBoundaryControls({ hasDataColumn = false }: { hasDataColumn?: boolean }) {
   const {
+    pluginId,
     boundaryVisibility,
     showLabels,
     labelVisibility,
@@ -187,6 +194,10 @@ export function MapBoundaryControls({ hasDataColumn = false }: { hasDataColumn?:
   }
 
   const labelsDisabled = !showLabels
+  const labelContentOptions = useMemo(
+    () => (pluginId === 'supervision-plan' ? supervisionLabelContentOptions : defaultLabelContentOptions),
+    [pluginId],
+  )
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">

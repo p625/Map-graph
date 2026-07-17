@@ -40,6 +40,7 @@ import {
 import { DEFAULT_BOUNDARY_VISIBILITY } from '../domain/export/mapTemplates'
 import type { BoundaryVisibility } from '../domain/territory/types'
 import type { RegionViewMode } from '../domain/region/types'
+import type { SupervisionYearFilter } from '../domain/supervision-plan/types'
 import {
   DEFAULT_MAP_EDITOR_VIEW,
   sanitizeMapEditorViewState,
@@ -80,6 +81,7 @@ interface MapState {
   selectedPolygon: HoveredPolygon | null
   focusedRegionId: string | null
   regionViewMode: RegionViewMode
+  supervisionYearFilter: SupervisionYearFilter
 }
 
 type MapAction =
@@ -115,6 +117,7 @@ type MapAction =
   | { type: 'set-focused-region'; regionId: string }
   | { type: 'clear-focused-region' }
   | { type: 'validate-focused-region'; validRegionIds: string[] }
+  | { type: 'set-supervision-year-filter'; filter: SupervisionYearFilter }
 
 const MAP_STORAGE_KEY = 'map-graph-map-v3'
 
@@ -143,6 +146,7 @@ const initialState: MapState = {
   selectedPolygon: null,
   focusedRegionId: null,
   regionViewMode: 'overview',
+  supervisionYearFilter: 'all',
 }
 
 function loadInitialMapState(): MapState {
@@ -185,6 +189,7 @@ function loadInitialMapState(): MapState {
     activeExportPresetKey: stored.activeExportPresetKey ?? 'presentation-16-9',
     focusedRegionId: stored.focusedRegionId ?? null,
     regionViewMode: stored.regionViewMode ?? 'overview',
+    supervisionYearFilter: stored.supervisionYearFilter ?? 'all',
   }
 }
 
@@ -387,6 +392,8 @@ function mapReducer(state: MapState, action: MapAction): MapState {
         selectedPolygon: null,
       }
     }
+    case 'set-supervision-year-filter':
+      return { ...state, supervisionYearFilter: action.filter }
     default:
       return state
   }
@@ -422,6 +429,7 @@ export function MapProvider({ children }: { children: ReactNode }) {
       activeExportPresetKey: state.activeExportPresetKey,
       focusedRegionId: state.focusedRegionId,
       regionViewMode: state.regionViewMode,
+      supervisionYearFilter: state.supervisionYearFilter,
     })
   }, [
     state.pluginId,
@@ -446,6 +454,7 @@ export function MapProvider({ children }: { children: ReactNode }) {
     state.activeExportPresetKey,
     state.focusedRegionId,
     state.regionViewMode,
+    state.supervisionYearFilter,
   ])
 
   return (
@@ -563,6 +572,8 @@ export function useMapActions() {
       clearFocusedRegion: () => dispatch({ type: 'clear-focused-region' }),
       validateFocusedRegion: (validRegionIds: string[]) =>
         dispatch({ type: 'validate-focused-region', validRegionIds }),
+      setSupervisionYearFilter: (filter: SupervisionYearFilter) =>
+        dispatch({ type: 'set-supervision-year-filter', filter }),
     }),
     [dispatch],
   )

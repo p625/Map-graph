@@ -28,6 +28,7 @@
     "validate-dataset-editor": "tsx scripts/validate-dataset-editor.ts",
     "validate-persistent-workspace": "tsx scripts/validate-persistent-workspace.ts",
     "validate-label-position-persistence": "tsx scripts/validate-label-position-persistence.ts",
+    "validate-supervision-plan": "tsx scripts/validate-supervision-plan.ts",
     "validate-organization-legend-layout": "tsx scripts/validate-region-label-halo-legend-resize-focus.ts",
     "validate-phase-5c-region-colors-org-legend-export-presets": "tsx scripts/validate-phase-5c-region-colors-org-legend-export-presets.ts"
   },

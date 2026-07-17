@@ -4,6 +4,7 @@ import { cn } from '../../utils/cn'
 const links = [
   { to: '/dashboard', label: 'Přehled projektu' },
   { to: '/map', label: 'Mapa' },
+  { to: '/supervision-plan', label: 'Plán supervizí' },
   { to: '/datasets', label: 'Datasety' },
   { to: '/datasets/wizard', label: 'Import wizard' },
   { to: '/config/districts', label: 'Okresy → Pracoviště' },

@@ -7,12 +7,15 @@ import { categoricalPlugin } from './categoricalPlugin'
 import { choroplethPlugin } from './choroplethPlugin'
 import { neutralPlugin } from './neutralPlugin'
 
+import { supervisionPlanPlugin } from './supervisionPlanPlugin'
+
 export const visualizationPlugins: VisualizationPlugin[] = [
   neutralPlugin,
   byDistrictPlugin,
   byWorkplacePlugin,
   byRegionalOfficePlugin,
   byLeaderPlugin,
+  supervisionPlanPlugin,
   choroplethPlugin,
   categoricalPlugin,
 ]
@@ -25,4 +28,5 @@ export {
   byLeaderPlugin,
   choroplethPlugin,
   categoricalPlugin,
+  supervisionPlanPlugin,
 }

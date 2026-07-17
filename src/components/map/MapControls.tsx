@@ -8,12 +8,14 @@ import { useActiveDataset, useDatasetState } from '../../store/datasetStore'
 import { useConfigData } from '../../store/configStore'
 import { isOrganizationSynced } from '../../store/organizationStore'
 import { useMapActions, useMapState } from '../../store/mapStore'
+import { useSupervisionPlan } from '../../store/supervisionPlanStore'
+import type { SupervisionYearFilter } from '../../domain/supervision-plan/types'
 import { MapGuardBanner } from './MapGuardBanner'
 import { ThemeSelector } from './ThemeSelector'
 
 export function MapControls() {
-  const { pluginId, datasetId, columnKey } = useMapState()
-  const { setPlugin, setDataset, setColumn } = useMapActions()
+  const { pluginId, datasetId, columnKey, supervisionYearFilter } = useMapState()
+  const { setPlugin, setDataset, setColumn, setSupervisionYearFilter } = useMapActions()
   const { datasets } = useDatasetState()
   const { dataset } = useActiveDataset(datasetId)
   const { organizationSnapshot } = useConfigData()
@@ -29,6 +31,7 @@ export function MapControls() {
 
   const orgVizBlocked =
     plugin?.requiresOrganization && !canUseOrganizationVisualization(pluginId, orgSynced)
+  const supervisionPlan = useSupervisionPlan()
 
   useEffect(() => {
     if (datasetId && !datasets.some((item) => item.id === datasetId)) {
@@ -108,9 +111,43 @@ export function MapControls() {
         {!plugin?.requiresDataset && (
           <div className="text-sm text-slate-500 md:col-span-2">
             {orgVizBlocked
-              ? 'Synchronizujte organizaci pro režim podle vedoucích.'
-              : 'Organizační vizualizace používá konfiguraci pracovišť, regionů a barev.'}
+              ? pluginId === 'supervision-plan'
+                ? 'Synchronizujte organizaci pro plán supervizí.'
+                : 'Synchronizujte organizaci pro režim podle vedoucích.'
+              : pluginId === 'supervision-plan'
+                ? 'Pracoviště jsou obarvena podle plánovaného roku supervize.'
+                : 'Organizační vizualizace používá konfiguraci pracovišť, regionů a barev.'}
           </div>
+        )}
+
+        {pluginId === 'supervision-plan' && orgSynced && (
+          <label className="space-y-1 text-sm md:col-span-2">
+            <span className="font-medium text-slate-700">Zobrazit rok</span>
+            <select
+              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              value={
+                supervisionYearFilter === 'all' || supervisionYearFilter === 'unplanned'
+                  ? supervisionYearFilter
+                  : String(supervisionYearFilter)
+              }
+              onChange={(event) => {
+                const value = event.target.value
+                const filter: SupervisionYearFilter =
+                  value === 'all' || value === 'unplanned' ? value : Number(value)
+                setSupervisionYearFilter(filter)
+              }}
+            >
+              <option value="all">Všechny roky</option>
+              {supervisionPlan.years
+                .filter((y) => y.isActive)
+                .map((y) => (
+                  <option key={y.year} value={y.year}>
+                    {y.year}
+                  </option>
+                ))}
+              <option value="unplanned">Bez plánu</option>
+            </select>
+          </label>
         )}
       </div>
     </div>

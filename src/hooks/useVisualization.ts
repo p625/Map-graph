@@ -8,16 +8,18 @@ import { useConfigData, useConfigState } from '../store/configStore'
 import { isOrganizationSynced } from '../store/organizationStore'
 import { useActiveDataset } from '../store/datasetStore'
 import { useMapState } from '../store/mapStore'
+import { useSupervisionPlan } from '../store/supervisionPlanStore'
 import { useRegionScope } from './useRegionScope'
 
 export function useVisualizationContext(): VisualizationContext {
   const config = useConfigState()
   const { workplaces, regionalOffices, organizationSnapshot } = useConfigData()
-  const { datasetId, columnKey, themeId } = useMapState()
+  const { datasetId, columnKey, themeId, pluginId, supervisionYearFilter } = useMapState()
   const { dataset, records } = useActiveDataset(datasetId)
   const theme = getThemeById(themeId)
   const orgSynced = isOrganizationSynced(organizationSnapshot)
   const regionScope = useRegionScope()
+  const supervisionPlanData = useSupervisionPlan()
 
   return useMemo(() => {
     const column = dataset?.columns.find((item) => item.key === columnKey)
@@ -37,6 +39,10 @@ export function useVisualizationContext(): VisualizationContext {
             workplaces: organizationSnapshot.workplaces.filter((wp) => !wp.absentFromSync),
           }
         : undefined,
+      supervisionPlan:
+        pluginId === 'supervision-plan' && orgSynced
+          ? { ...supervisionPlanData, yearFilter: supervisionYearFilter }
+          : undefined,
       regionScope,
       dataset: dataset ?? undefined,
       records: records.length > 0 ? records : undefined,
@@ -54,6 +60,9 @@ export function useVisualizationContext(): VisualizationContext {
     records,
     columnKey,
     theme,
+    pluginId,
+    supervisionPlanData,
+    supervisionYearFilter,
   ])
 }
 

@@ -23,6 +23,7 @@ const moduleLabels: Record<WorkspaceModuleKey, string> = {
   map: 'Mapová nastavení',
   workplaceLabelOverrides: 'Popisky pracovišť',
   regionLabelOverrides: 'Popisky regionů',
+  supervisionPlan: 'Plán supervizí',
   templates: 'Šablony',
   exportPresets: 'Exportní presety',
 }

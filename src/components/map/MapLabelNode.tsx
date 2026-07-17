@@ -31,7 +31,11 @@ export function MapLabelNode({
   const fontSizePx = rendered.fontSizePx
   const lineHeight = fontSizePx * 1.1
   const valueGap = fontSizePx * 1.25
-  const showValue = Boolean(rendered.valueText && rendered.contentMode !== 'name')
+  const showValue = Boolean(
+    rendered.valueText &&
+      (rendered.contentMode === 'name-value' ||
+        rendered.contentMode === 'supervision-name-year'),
+  )
   const nameLines =
     rendered.contentMode === 'value' && rendered.valueText
       ? []
@@ -90,7 +94,7 @@ export function MapLabelNode({
         />
       )}
       <text {...textProps}>
-        {rendered.contentMode === 'value' && rendered.valueText ? (
+        {rendered.contentMode === 'value' || rendered.contentMode === 'supervision-year' ? (
           rendered.valueText
         ) : (
           <>

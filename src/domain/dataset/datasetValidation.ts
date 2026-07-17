@@ -29,7 +29,7 @@ export function migrateDatasetStatus(status: string): DatasetStatus {
 
 export const DATA_VISUALIZATION_PLUGINS = ['choropleth', 'categorical'] as const
 
-export const ORGANIZATION_PLUGINS = ['by-leader'] as const
+export const ORGANIZATION_PLUGINS = ['by-leader', 'supervision-plan'] as const
 
 export function isDataVisualizationPlugin(pluginId: string): boolean {
   return (DATA_VISUALIZATION_PLUGINS as readonly string[]).includes(pluginId)

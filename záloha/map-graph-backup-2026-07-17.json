@@ -1,0 +1,3085 @@
+{
+  "version": 1,
+  "exportedAt": "2026-07-17T11:42:47.853Z",
+  "modules": {
+    "organization": {
+      "regions": [
+        {
+          "id": "region-brno",
+          "name": "Brno",
+          "code": "brno"
+        },
+        {
+          "id": "region-ceske-budejovice",
+          "name": "České Budějovice",
+          "code": "ceske-budejovice"
+        },
+        {
+          "id": "region-hradec-kralove",
+          "name": "Hradec Králové",
+          "code": "hradec-kralove"
+        },
+        {
+          "id": "region-olomouc",
+          "name": "Olomouc",
+          "code": "olomouc"
+        },
+        {
+          "id": "region-opava",
+          "name": "Opava",
+          "code": "opava"
+        },
+        {
+          "id": "region-praha",
+          "name": "Praha",
+          "code": "praha"
+        },
+        {
+          "id": "region-usti-nad-labem",
+          "name": "Ústí nad Labem",
+          "code": "usti-nad-labem"
+        }
+      ],
+      "orgUnits": [
+        {
+          "id": "S11108",
+          "designation": "S11108",
+          "name": "Zárybnický"
+        },
+        {
+          "id": "S11109",
+          "designation": "S11109",
+          "name": "Štulíková"
+        },
+        {
+          "id": "S11110",
+          "designation": "S11110",
+          "name": "Hejdánková"
+        },
+        {
+          "id": "S11208",
+          "designation": "S11208",
+          "name": "Waldmann"
+        },
+        {
+          "id": "S11209",
+          "designation": "S11209",
+          "name": "Český"
+        },
+        {
+          "id": "S11210",
+          "designation": "S11210",
+          "name": "Dyntar"
+        },
+        {
+          "id": "S11308",
+          "designation": "S11308",
+          "name": "Čermák"
+        },
+        {
+          "id": "S11408",
+          "designation": "S11408",
+          "name": "Weisbauerová"
+        },
+        {
+          "id": "S11409",
+          "designation": "S11409",
+          "name": "Nechvílová"
+        },
+        {
+          "id": "S11410",
+          "designation": "S11410",
+          "name": "Lapáček"
+        },
+        {
+          "id": "S11508",
+          "designation": "S11508",
+          "name": "Adamec"
+        },
+        {
+          "id": "S11509",
+          "designation": "S11509",
+          "name": "Vítů"
+        },
+        {
+          "id": "S11510",
+          "designation": "S11510",
+          "name": "Skopal"
+        },
+        {
+          "id": "S11608",
+          "designation": "S11608",
+          "name": "Slováková"
+        },
+        {
+          "id": "S11609",
+          "designation": "S11609",
+          "name": "Vrtělová"
+        },
+        {
+          "id": "S11708",
+          "designation": "S11708",
+          "name": "Kotíková"
+        }
+      ],
+      "leaders": [
+        {
+          "id": "leader-adamec",
+          "name": "Adamec",
+          "orgUnitId": "S11508",
+          "color": "#b45309"
+        },
+        {
+          "id": "leader-cermak",
+          "name": "Čermák",
+          "orgUnitId": "S11308",
+          "color": "#ea580c"
+        },
+        {
+          "id": "leader-cesky",
+          "name": "Český",
+          "orgUnitId": "S11209",
+          "color": "#9333ea"
+        },
+        {
+          "id": "leader-dyntar",
+          "name": "Dyntar",
+          "orgUnitId": "S11210",
+          "color": "#0891b2"
+        },
+        {
+          "id": "leader-hejdankova",
+          "name": "Hejdánková",
+          "orgUnitId": "S11110",
+          "color": "#16a34a"
+        },
+        {
+          "id": "leader-kotikova",
+          "name": "Kotíková",
+          "orgUnitId": "S11708",
+          "color": "#2563eb"
+        },
+        {
+          "id": "leader-lapacek",
+          "name": "Lapáček",
+          "orgUnitId": "S11410",
+          "color": "#0d9488"
+        },
+        {
+          "id": "leader-nechvilova",
+          "name": "Nechvílová",
+          "orgUnitId": "S11409",
+          "color": "#4f46e5"
+        },
+        {
+          "id": "leader-skopal",
+          "name": "Skopal",
+          "orgUnitId": "S11510",
+          "color": "#0369a1"
+        },
+        {
+          "id": "leader-slovakova",
+          "name": "Slováková",
+          "orgUnitId": "S11608",
+          "color": "#15803d"
+        },
+        {
+          "id": "leader-stulikova",
+          "name": "Štulíková",
+          "orgUnitId": "S11109",
+          "color": "#dc2626"
+        },
+        {
+          "id": "leader-vitu",
+          "name": "Vítů",
+          "orgUnitId": "S11509",
+          "color": "#7c3aed"
+        },
+        {
+          "id": "leader-vrtelova",
+          "name": "Vrtělová",
+          "orgUnitId": "S11609",
+          "color": "#c2410c"
+        },
+        {
+          "id": "leader-waldmann",
+          "name": "Waldmann",
+          "orgUnitId": "S11208",
+          "color": "#ca8a04"
+        },
+        {
+          "id": "leader-weisbauerova",
+          "name": "Weisbauerová",
+          "orgUnitId": "S11408",
+          "color": "#be185d"
+        },
+        {
+          "id": "leader-zarybnicky",
+          "name": "Zárybnický",
+          "orgUnitId": "S11108",
+          "color": "#2563eb"
+        }
+      ],
+      "workplaces": [
+        {
+          "id": "wp-001",
+          "name": "Benešov",
+          "regionId": "region-praha",
+          "leaderId": "leader-zarybnicky",
+          "orgUnitId": "S11108",
+          "lpisName": "Benešov (PH)"
+        },
+        {
+          "id": "wp-beroun",
+          "name": "Beroun",
+          "regionId": "region-praha",
+          "leaderId": "leader-stulikova",
+          "orgUnitId": "S11109",
+          "lpisName": "Králův Dvůr"
+        },
+        {
+          "id": "wp-002",
+          "name": "Blansko",
+          "regionId": "region-brno",
+          "leaderId": "leader-adamec",
+          "orgUnitId": "S11508",
+          "lpisName": "Blansko (BM)"
+        },
+        {
+          "id": "wp-003",
+          "name": "Brno",
+          "regionId": "region-brno",
+          "leaderId": "leader-adamec",
+          "orgUnitId": "S11508",
+          "lpisName": "Brno (BM)"
+        },
+        {
+          "id": "wp-004",
+          "name": "Bruntál",
+          "regionId": "region-opava",
+          "leaderId": "leader-kotikova",
+          "orgUnitId": "S11708",
+          "lpisName": "Bruntál (OP)"
+        },
+        {
+          "id": "wp-005",
+          "name": "Břeclav",
+          "regionId": "region-brno",
+          "leaderId": "leader-skopal",
+          "orgUnitId": "S11510",
+          "lpisName": "Břeclav (BM)"
+        },
+        {
+          "id": "wp-006",
+          "name": "Česká Lípa",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-nechvilova",
+          "orgUnitId": "S11409",
+          "lpisName": "Česká Lípa (HK)"
+        },
+        {
+          "id": "wp-007",
+          "name": "České Budějovice",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-waldmann",
+          "orgUnitId": "S11208",
+          "lpisName": "Č. Budějovice"
+        },
+        {
+          "id": "wp-008",
+          "name": "Český Krumlov",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-waldmann",
+          "orgUnitId": "S11208",
+          "lpisName": "Č. Krumlov (CB)"
+        },
+        {
+          "id": "wp-009",
+          "name": "Děčín",
+          "regionId": "region-usti-nad-labem",
+          "leaderId": "leader-cermak",
+          "orgUnitId": "S11308",
+          "lpisName": "Děčín (UL)"
+        },
+        {
+          "id": "wp-010",
+          "name": "Domažlice",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-dyntar",
+          "orgUnitId": "S11210",
+          "lpisName": "Domažlice (CB)"
+        },
+        {
+          "id": "wp-011",
+          "name": "Frýdek-Místek",
+          "regionId": "region-opava",
+          "leaderId": "leader-kotikova",
+          "orgUnitId": "S11708",
+          "lpisName": "Frýdek-Míst(OP)"
+        },
+        {
+          "id": "wp-012",
+          "name": "Havlíčkův Brod",
+          "regionId": "region-brno",
+          "leaderId": "leader-vitu",
+          "orgUnitId": "S11509",
+          "lpisName": "Havl. Brod (BM)"
+        },
+        {
+          "id": "wp-013",
+          "name": "Hodonín",
+          "regionId": "region-brno",
+          "leaderId": "leader-skopal",
+          "orgUnitId": "S11510",
+          "lpisName": "Hodonín (BM)"
+        },
+        {
+          "id": "wp-014",
+          "name": "Hradec Králové",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-weisbauerova",
+          "orgUnitId": "S11408",
+          "lpisName": "Hradec Králové"
+        },
+        {
+          "id": "wp-015",
+          "name": "Cheb",
+          "regionId": "region-usti-nad-labem",
+          "leaderId": "leader-cermak",
+          "orgUnitId": "S11308",
+          "lpisName": "Cheb (UL)"
+        },
+        {
+          "id": "wp-016",
+          "name": "Chrudim",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-lapacek",
+          "orgUnitId": "S11410",
+          "lpisName": "Chrudim (HK)"
+        },
+        {
+          "id": "wp-017",
+          "name": "Jeseník",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-vrtelova",
+          "orgUnitId": "S11609",
+          "lpisName": "Jeseník (OL)"
+        },
+        {
+          "id": "wp-018",
+          "name": "Jičín",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-weisbauerova",
+          "orgUnitId": "S11408",
+          "lpisName": "Jičín (HK)"
+        },
+        {
+          "id": "wp-019",
+          "name": "Jihlava",
+          "regionId": "region-brno",
+          "leaderId": "leader-vitu",
+          "orgUnitId": "S11509",
+          "lpisName": "Jihlava (BM)"
+        },
+        {
+          "id": "wp-020",
+          "name": "Jindřichův Hradec",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-waldmann",
+          "orgUnitId": "S11208",
+          "lpisName": "Jind.Hradec (CB"
+        },
+        {
+          "id": "wp-021",
+          "name": "Karlovy Vary",
+          "regionId": "region-usti-nad-labem",
+          "leaderId": "leader-cermak",
+          "orgUnitId": "S11308",
+          "lpisName": "K. Vary (UL)"
+        },
+        {
+          "id": "wp-022",
+          "name": "Kladno",
+          "regionId": "region-praha",
+          "leaderId": "leader-stulikova",
+          "orgUnitId": "S11109",
+          "lpisName": "Kladno (PH)"
+        },
+        {
+          "id": "wp-023",
+          "name": "Klatovy",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-dyntar",
+          "orgUnitId": "S11210",
+          "lpisName": "Klatovy (CB)"
+        },
+        {
+          "id": "wp-024",
+          "name": "Kolín",
+          "regionId": "region-praha",
+          "leaderId": "leader-hejdankova",
+          "orgUnitId": "S11110",
+          "lpisName": "Kolín (PH)"
+        },
+        {
+          "id": "wp-026",
+          "name": "Kroměříž",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-slovakova",
+          "orgUnitId": "S11608",
+          "lpisName": "Kroměříž (OL)"
+        },
+        {
+          "id": "wp-027",
+          "name": "Kutná Hora",
+          "regionId": "region-praha",
+          "leaderId": "leader-hejdankova",
+          "orgUnitId": "S11110",
+          "lpisName": "Kutná Hora (PH)"
+        },
+        {
+          "id": "wp-028",
+          "name": "Liberec",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-nechvilova",
+          "orgUnitId": "S11409",
+          "lpisName": "Liberec (HK)"
+        },
+        {
+          "id": "wp-029",
+          "name": "Litoměřice",
+          "regionId": "region-usti-nad-labem",
+          "leaderId": "leader-cermak",
+          "orgUnitId": "S11308",
+          "lpisName": "Litoměřice (UL)"
+        },
+        {
+          "id": "wp-030",
+          "name": "Louny",
+          "regionId": "region-usti-nad-labem",
+          "leaderId": "leader-cermak",
+          "orgUnitId": "S11308",
+          "lpisName": "Louny (UL)"
+        },
+        {
+          "id": "wp-031",
+          "name": "Mělník",
+          "regionId": "region-praha",
+          "leaderId": "leader-zarybnicky",
+          "orgUnitId": "S11108",
+          "lpisName": "Mělník (PH)"
+        },
+        {
+          "id": "wp-032",
+          "name": "Mladá Boleslav",
+          "regionId": "region-praha",
+          "leaderId": "leader-hejdankova",
+          "orgUnitId": "S11110",
+          "lpisName": "Ml. Boleslav (PH)"
+        },
+        {
+          "id": "wp-033",
+          "name": "Náchod",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-weisbauerova",
+          "orgUnitId": "S11408",
+          "lpisName": "Náchod (HK)"
+        },
+        {
+          "id": "wp-034",
+          "name": "Nový Jičín",
+          "regionId": "region-opava",
+          "leaderId": "leader-kotikova",
+          "orgUnitId": "S11708",
+          "lpisName": "Nový Jičín (OP)"
+        },
+        {
+          "id": "wp-035",
+          "name": "Nymburk",
+          "regionId": "region-praha",
+          "leaderId": "leader-hejdankova",
+          "orgUnitId": "S11110",
+          "lpisName": "Nymburk (PH)"
+        },
+        {
+          "id": "wp-036",
+          "name": "Olomouc",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-vrtelova",
+          "orgUnitId": "S11609",
+          "lpisName": "Olomouc (OL)"
+        },
+        {
+          "id": "wp-037",
+          "name": "Opava",
+          "regionId": "region-opava",
+          "leaderId": "leader-kotikova",
+          "orgUnitId": "S11708",
+          "lpisName": "Opava (OP)"
+        },
+        {
+          "id": "wp-038",
+          "name": "Pardubice",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-lapacek",
+          "orgUnitId": "S11410",
+          "lpisName": "Pardubice (HK)"
+        },
+        {
+          "id": "wp-039",
+          "name": "Pelhřimov",
+          "regionId": "region-brno",
+          "leaderId": "leader-vitu",
+          "orgUnitId": "S11509",
+          "lpisName": "Pelhřimov (BM)"
+        },
+        {
+          "id": "wp-040",
+          "name": "Písek",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-cesky",
+          "orgUnitId": "S11209",
+          "lpisName": "Písek (CB)"
+        },
+        {
+          "id": "wp-041",
+          "name": "Plzeň",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-dyntar",
+          "orgUnitId": "S11210",
+          "lpisName": "Plzeň (CB)"
+        },
+        {
+          "id": "wp-042",
+          "name": "Praha",
+          "regionId": "region-praha",
+          "leaderId": "leader-zarybnicky",
+          "orgUnitId": "S11108",
+          "lpisName": "Praha (PH)"
+        },
+        {
+          "id": "wp-043",
+          "name": "Prachatice",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-waldmann",
+          "orgUnitId": "S11208",
+          "lpisName": "Prachatice (CB)"
+        },
+        {
+          "id": "wp-044",
+          "name": "Prostějov",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-vrtelova",
+          "orgUnitId": "S11609",
+          "lpisName": "Prostějov (OL)"
+        },
+        {
+          "id": "wp-045",
+          "name": "Přerov",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-vrtelova",
+          "orgUnitId": "S11609",
+          "lpisName": "Přerov (OL)"
+        },
+        {
+          "id": "wp-046",
+          "name": "Příbram",
+          "regionId": "region-praha",
+          "leaderId": "leader-stulikova",
+          "orgUnitId": "S11109",
+          "lpisName": "Příbram (PH)"
+        },
+        {
+          "id": "wp-047",
+          "name": "Rakovník",
+          "regionId": "region-praha",
+          "leaderId": "leader-stulikova",
+          "orgUnitId": "S11109",
+          "lpisName": "Rakovník (PH)"
+        },
+        {
+          "id": "wp-048",
+          "name": "Rokycany",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-dyntar",
+          "orgUnitId": "S11210",
+          "lpisName": "Rokycany (CB)"
+        },
+        {
+          "id": "wp-049",
+          "name": "Rychnov nad Kněžnou",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-weisbauerova",
+          "orgUnitId": "S11408",
+          "lpisName": "Rychnov n.K(HK)"
+        },
+        {
+          "id": "wp-050",
+          "name": "Semily",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-nechvilova",
+          "orgUnitId": "S11409",
+          "lpisName": "Semily (HK)"
+        },
+        {
+          "id": "wp-051",
+          "name": "Strakonice",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-cesky",
+          "orgUnitId": "S11209",
+          "lpisName": "Strakonice (CB)"
+        },
+        {
+          "id": "wp-052",
+          "name": "Svitavy",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-lapacek",
+          "orgUnitId": "S11410",
+          "lpisName": "Svitavy (HK)"
+        },
+        {
+          "id": "wp-053",
+          "name": "Šumperk",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-vrtelova",
+          "orgUnitId": "S11609",
+          "lpisName": "Šumperk (OL)"
+        },
+        {
+          "id": "wp-054",
+          "name": "Tábor",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-cesky",
+          "orgUnitId": "S11209",
+          "lpisName": "Tábor (CB)"
+        },
+        {
+          "id": "wp-055",
+          "name": "Tachov",
+          "regionId": "region-ceske-budejovice",
+          "leaderId": "leader-dyntar",
+          "orgUnitId": "S11210",
+          "lpisName": "Tachov (CB)"
+        },
+        {
+          "id": "wp-056",
+          "name": "Trutnov",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-weisbauerova",
+          "orgUnitId": "S11408",
+          "lpisName": "Trutnov (HK)"
+        },
+        {
+          "id": "wp-057",
+          "name": "Třebíč",
+          "regionId": "region-brno",
+          "leaderId": "leader-adamec",
+          "orgUnitId": "S11508",
+          "lpisName": "Třebíč (BM)"
+        },
+        {
+          "id": "wp-058",
+          "name": "Uherské Hradiště",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-slovakova",
+          "orgUnitId": "S11608",
+          "lpisName": "Uh.Hradiště(OL)"
+        },
+        {
+          "id": "wp-059",
+          "name": "Ústí nad Labem",
+          "regionId": "region-usti-nad-labem",
+          "leaderId": "leader-cermak",
+          "orgUnitId": "S11308",
+          "lpisName": "Ústí n.Labem"
+        },
+        {
+          "id": "wp-060",
+          "name": "Ústí nad Orlicí",
+          "regionId": "region-hradec-kralove",
+          "leaderId": "leader-lapacek",
+          "orgUnitId": "S11410",
+          "lpisName": "Ústí nad O.(HK)"
+        },
+        {
+          "id": "wp-061",
+          "name": "Vsetín",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-slovakova",
+          "orgUnitId": "S11608",
+          "lpisName": "Vsetín (OL)"
+        },
+        {
+          "id": "wp-062",
+          "name": "Vyškov",
+          "regionId": "region-brno",
+          "leaderId": "leader-adamec",
+          "orgUnitId": "S11508",
+          "lpisName": "Vyškov (BM)"
+        },
+        {
+          "id": "wp-063",
+          "name": "Zlín",
+          "regionId": "region-olomouc",
+          "leaderId": "leader-slovakova",
+          "orgUnitId": "S11608",
+          "lpisName": "Zlín (OL)"
+        },
+        {
+          "id": "wp-064",
+          "name": "Znojmo",
+          "regionId": "region-brno",
+          "leaderId": "leader-skopal",
+          "orgUnitId": "S11510",
+          "lpisName": "Znojmo (BM)"
+        },
+        {
+          "id": "wp-065",
+          "name": "Žďár nad Sázavou",
+          "regionId": "region-brno",
+          "leaderId": "leader-vitu",
+          "orgUnitId": "S11509",
+          "lpisName": "Žďár n.S. (BM)"
+        },
+        {
+          "id": "wp-025",
+          "name": "Králův Dvůr",
+          "code": "25",
+          "regionId": "",
+          "leaderId": "",
+          "orgUnitId": "",
+          "absentFromSync": true
+        }
+      ],
+      "districtAssignments": [
+        {
+          "districtId": "district-40169",
+          "workplaceId": "wp-001",
+          "rawOkresName": "Benešov",
+          "lpisName": "Benešov (PH)"
+        },
+        {
+          "districtId": "district-40215",
+          "workplaceId": "wp-031",
+          "rawOkresName": "Mělník",
+          "lpisName": "Mělník (PH)"
+        },
+        {
+          "districtId": "district-40924",
+          "workplaceId": "wp-042",
+          "rawOkresName": "Praha",
+          "lpisName": "Praha (PH)"
+        },
+        {
+          "districtId": "district-40240",
+          "workplaceId": "wp-042",
+          "rawOkresName": "Praha-východ",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40258",
+          "workplaceId": "wp-042",
+          "rawOkresName": "Praha-západ",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40185",
+          "workplaceId": "wp-022",
+          "rawOkresName": "Kladno",
+          "lpisName": "Kladno (PH)"
+        },
+        {
+          "districtId": "district-40177",
+          "workplaceId": "wp-beroun",
+          "rawOkresName": "Králův Dvůr",
+          "lpisName": "Králův Dvůr"
+        },
+        {
+          "districtId": "district-40266",
+          "workplaceId": "wp-046",
+          "rawOkresName": "Příbram",
+          "lpisName": "Příbram (PH)"
+        },
+        {
+          "districtId": "district-40274",
+          "workplaceId": "wp-047",
+          "rawOkresName": "Rakovník",
+          "lpisName": "Rakovník (PH)"
+        },
+        {
+          "districtId": "district-40193",
+          "workplaceId": "wp-024",
+          "rawOkresName": "Kolín",
+          "lpisName": "Kolín (PH)"
+        },
+        {
+          "districtId": "district-40207",
+          "workplaceId": "wp-027",
+          "rawOkresName": "Kutná Hora",
+          "lpisName": "Kutná Hora (PH)"
+        },
+        {
+          "districtId": "district-40223",
+          "workplaceId": "wp-032",
+          "rawOkresName": "Mladá Boleslav",
+          "lpisName": "Ml. Boleslav (PH)"
+        },
+        {
+          "districtId": "district-40231",
+          "workplaceId": "wp-035",
+          "rawOkresName": "Nymburk",
+          "lpisName": "Nymburk (PH)"
+        },
+        {
+          "districtId": "district-40282",
+          "workplaceId": "wp-007",
+          "rawOkresName": "České Budějovice",
+          "lpisName": "Č. Budějovice"
+        },
+        {
+          "districtId": "district-40291",
+          "workplaceId": "wp-008",
+          "rawOkresName": "Český Krumlov",
+          "lpisName": "Č. Krumlov (CB)"
+        },
+        {
+          "districtId": "district-40304",
+          "workplaceId": "wp-020",
+          "rawOkresName": "Jindřichův Hradec",
+          "lpisName": "Jind.Hradec (CB"
+        },
+        {
+          "districtId": "district-40321",
+          "workplaceId": "wp-043",
+          "rawOkresName": "Prachatice",
+          "lpisName": "Prachatice (CB)"
+        },
+        {
+          "districtId": "district-40312",
+          "workplaceId": "wp-040",
+          "rawOkresName": "Písek",
+          "lpisName": "Písek (CB)"
+        },
+        {
+          "districtId": "district-40339",
+          "workplaceId": "wp-051",
+          "rawOkresName": "Strakonice",
+          "lpisName": "Strakonice (CB)"
+        },
+        {
+          "districtId": "district-40347",
+          "workplaceId": "wp-054",
+          "rawOkresName": "Tábor",
+          "lpisName": "Tábor (CB)"
+        },
+        {
+          "districtId": "district-40355",
+          "workplaceId": "wp-010",
+          "rawOkresName": "Domažlice",
+          "lpisName": "Domažlice (CB)"
+        },
+        {
+          "districtId": "district-40363",
+          "workplaceId": "wp-023",
+          "rawOkresName": "Klatovy",
+          "lpisName": "Klatovy (CB)"
+        },
+        {
+          "districtId": "district-40371",
+          "workplaceId": "wp-041",
+          "rawOkresName": "Plzeň",
+          "lpisName": "Plzeň (CB)"
+        },
+        {
+          "districtId": "district-40401",
+          "workplaceId": "wp-048",
+          "rawOkresName": "Rokycany",
+          "lpisName": "Rokycany (CB)"
+        },
+        {
+          "districtId": "district-40410",
+          "workplaceId": "wp-055",
+          "rawOkresName": "Tachov",
+          "lpisName": "Tachov (CB)"
+        },
+        {
+          "districtId": "district-40371",
+          "workplaceId": "wp-041",
+          "rawOkresName": "Plzeň-město",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40380",
+          "workplaceId": "wp-041",
+          "rawOkresName": "Plzeň-jih",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40398",
+          "workplaceId": "wp-041",
+          "rawOkresName": "Plzen-sever",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40452",
+          "workplaceId": "wp-009",
+          "rawOkresName": "Děčín",
+          "lpisName": "Děčín (UL)"
+        },
+        {
+          "districtId": "district-40428",
+          "workplaceId": "wp-015",
+          "rawOkresName": "Cheb",
+          "lpisName": "Cheb (UL)"
+        },
+        {
+          "districtId": "district-40436",
+          "workplaceId": "wp-021",
+          "rawOkresName": "Karlovy Vary",
+          "lpisName": "K. Vary (UL)"
+        },
+        {
+          "districtId": "district-40479",
+          "workplaceId": "wp-029",
+          "rawOkresName": "Litoměřice",
+          "lpisName": "Litoměřice (UL)"
+        },
+        {
+          "districtId": "district-40487",
+          "workplaceId": "wp-030",
+          "rawOkresName": "Louny",
+          "lpisName": "Louny (UL)"
+        },
+        {
+          "districtId": "district-40517",
+          "workplaceId": "wp-059",
+          "rawOkresName": "Ústí nad Labem",
+          "lpisName": "Ústí n.Labem"
+        },
+        {
+          "districtId": "district-40444",
+          "workplaceId": "wp-015",
+          "rawOkresName": "Sokolov",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40461",
+          "workplaceId": "wp-059",
+          "rawOkresName": "Chomutov",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40509",
+          "workplaceId": "wp-059",
+          "rawOkresName": "Teplice",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40495",
+          "workplaceId": "wp-059",
+          "rawOkresName": "Most",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40568",
+          "workplaceId": "wp-014",
+          "rawOkresName": "Hradec Králové",
+          "lpisName": "Hradec Králové"
+        },
+        {
+          "districtId": "district-40576",
+          "workplaceId": "wp-018",
+          "rawOkresName": "Jičín",
+          "lpisName": "Jičín (HK)"
+        },
+        {
+          "districtId": "district-40584",
+          "workplaceId": "wp-033",
+          "rawOkresName": "Náchod",
+          "lpisName": "Náchod (HK)"
+        },
+        {
+          "districtId": "district-40592",
+          "workplaceId": "wp-049",
+          "rawOkresName": "Rychnov nad Kněžnou",
+          "lpisName": "Rychnov n.K(HK)"
+        },
+        {
+          "districtId": "district-40606",
+          "workplaceId": "wp-056",
+          "rawOkresName": "Trutnov",
+          "lpisName": "Trutnov (HK)"
+        },
+        {
+          "districtId": "district-40525",
+          "workplaceId": "wp-006",
+          "rawOkresName": "Česká Lípa",
+          "lpisName": "Česká Lípa (HK)"
+        },
+        {
+          "districtId": "district-40541",
+          "workplaceId": "wp-028",
+          "rawOkresName": "Liberec",
+          "lpisName": "Liberec (HK)"
+        },
+        {
+          "districtId": "district-40550",
+          "workplaceId": "wp-050",
+          "rawOkresName": "Semily",
+          "lpisName": "Semily (HK)"
+        },
+        {
+          "districtId": "district-40533",
+          "workplaceId": "wp-028",
+          "rawOkresName": "Jablonec nad Nisou",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40614",
+          "workplaceId": "wp-016",
+          "rawOkresName": "Chrudim",
+          "lpisName": "Chrudim (HK)"
+        },
+        {
+          "districtId": "district-40622",
+          "workplaceId": "wp-038",
+          "rawOkresName": "Pardubice",
+          "lpisName": "Pardubice (HK)"
+        },
+        {
+          "districtId": "district-40631",
+          "workplaceId": "wp-052",
+          "rawOkresName": "Svitavy",
+          "lpisName": "Svitavy (HK)"
+        },
+        {
+          "districtId": "district-40649",
+          "workplaceId": "wp-060",
+          "rawOkresName": "Ústí nad Orlicí",
+          "lpisName": "Ústí nad O.(HK)"
+        },
+        {
+          "districtId": "district-40703",
+          "workplaceId": "wp-002",
+          "rawOkresName": "Blansko",
+          "lpisName": "Blansko (BM)"
+        },
+        {
+          "districtId": "district-40711",
+          "workplaceId": "wp-003",
+          "rawOkresName": "Brno-město",
+          "lpisName": "Brno (BM)"
+        },
+        {
+          "districtId": "district-40681",
+          "workplaceId": "wp-057",
+          "rawOkresName": "Třebíč",
+          "lpisName": "Třebíč (BM)"
+        },
+        {
+          "districtId": "district-40754",
+          "workplaceId": "wp-062",
+          "rawOkresName": "Vyškov",
+          "lpisName": "Vyškov (BM)"
+        },
+        {
+          "districtId": "district-40720",
+          "workplaceId": "wp-003",
+          "rawOkresName": "Brno-venkov",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40657",
+          "workplaceId": "wp-012",
+          "rawOkresName": "Havlíčkův Brod",
+          "lpisName": "Havl. Brod (BM)"
+        },
+        {
+          "districtId": "district-40665",
+          "workplaceId": "wp-019",
+          "rawOkresName": "Jihlava",
+          "lpisName": "Jihlava (BM)"
+        },
+        {
+          "districtId": "district-40673",
+          "workplaceId": "wp-039",
+          "rawOkresName": "Pelhřimov",
+          "lpisName": "Pelhřimov (BM)"
+        },
+        {
+          "districtId": "district-40690",
+          "workplaceId": "wp-065",
+          "rawOkresName": "Žďár nad Sázavou",
+          "lpisName": "Žďár n.S. (BM)"
+        },
+        {
+          "districtId": "district-40738",
+          "workplaceId": "wp-005",
+          "rawOkresName": "Břeclav",
+          "lpisName": "Břeclav (BM)"
+        },
+        {
+          "districtId": "district-40746",
+          "workplaceId": "wp-013",
+          "rawOkresName": "Hodonín",
+          "lpisName": "Hodonín (BM)"
+        },
+        {
+          "districtId": "district-40762",
+          "workplaceId": "wp-064",
+          "rawOkresName": "Znojmo",
+          "lpisName": "Znojmo (BM)"
+        },
+        {
+          "districtId": "district-40827",
+          "workplaceId": "wp-026",
+          "rawOkresName": "Kroměříž",
+          "lpisName": "Kroměříž (OL)"
+        },
+        {
+          "districtId": "district-40835",
+          "workplaceId": "wp-058",
+          "rawOkresName": "Uherské Hradiště",
+          "lpisName": "Uh.Hradiště(OL)"
+        },
+        {
+          "districtId": "district-40843",
+          "workplaceId": "wp-061",
+          "rawOkresName": "Vsetín",
+          "lpisName": "Vsetín (OL)"
+        },
+        {
+          "districtId": "district-40851",
+          "workplaceId": "wp-063",
+          "rawOkresName": "Zlín",
+          "lpisName": "Zlín (OL)"
+        },
+        {
+          "districtId": "district-40771",
+          "workplaceId": "wp-017",
+          "rawOkresName": "Jeseník",
+          "lpisName": "Jeseník (OL)"
+        },
+        {
+          "districtId": "district-40789",
+          "workplaceId": "wp-036",
+          "rawOkresName": "Olomouc",
+          "lpisName": "Olomouc (OL)"
+        },
+        {
+          "districtId": "district-40797",
+          "workplaceId": "wp-044",
+          "rawOkresName": "Prostějov",
+          "lpisName": "Prostějov (OL)"
+        },
+        {
+          "districtId": "district-40801",
+          "workplaceId": "wp-045",
+          "rawOkresName": "Přerov",
+          "lpisName": "Přerov (OL)"
+        },
+        {
+          "districtId": "district-40819",
+          "workplaceId": "wp-053",
+          "rawOkresName": "Šumperk",
+          "lpisName": "Šumperk (OL)"
+        },
+        {
+          "districtId": "district-40860",
+          "workplaceId": "wp-004",
+          "rawOkresName": "Bruntál",
+          "lpisName": "Bruntál (OP)"
+        },
+        {
+          "districtId": "district-40878",
+          "workplaceId": "wp-011",
+          "rawOkresName": "Frýdek-Místek",
+          "lpisName": "Frýdek-Míst(OP)"
+        },
+        {
+          "districtId": "district-40894",
+          "workplaceId": "wp-034",
+          "rawOkresName": "Nový Jičín",
+          "lpisName": "Nový Jičín (OP)"
+        },
+        {
+          "districtId": "district-40908",
+          "workplaceId": "wp-037",
+          "rawOkresName": "Opava",
+          "lpisName": "Opava (OP)"
+        },
+        {
+          "districtId": "district-40916",
+          "workplaceId": "wp-037",
+          "rawOkresName": "Ostrava město",
+          "lpisName": ""
+        },
+        {
+          "districtId": "district-40886",
+          "workplaceId": "wp-037",
+          "rawOkresName": "Karviná",
+          "lpisName": ""
+        }
+      ],
+      "syncedAt": "2026-07-17T10:44:26.047Z",
+      "sourceFileName": "organizace.xlsx"
+    },
+    "config": {
+      "districtWorkplaceAssignments": {
+        "district-40169": "wp-001",
+        "district-40215": "wp-031",
+        "district-40924": "wp-042",
+        "district-40240": "wp-042",
+        "district-40258": "wp-042",
+        "district-40185": "wp-022",
+        "district-40177": "wp-beroun",
+        "district-40266": "wp-046",
+        "district-40274": "wp-047",
+        "district-40193": "wp-024",
+        "district-40207": "wp-027",
+        "district-40223": "wp-032",
+        "district-40231": "wp-035",
+        "district-40282": "wp-007",
+        "district-40291": "wp-008",
+        "district-40304": "wp-020",
+        "district-40321": "wp-043",
+        "district-40312": "wp-040",
+        "district-40339": "wp-051",
+        "district-40347": "wp-054",
+        "district-40355": "wp-010",
+        "district-40363": "wp-023",
+        "district-40371": "wp-041",
+        "district-40401": "wp-048",
+        "district-40410": "wp-055",
+        "district-40380": "wp-041",
+        "district-40398": "wp-041",
+        "district-40452": "wp-009",
+        "district-40428": "wp-015",
+        "district-40436": "wp-021",
+        "district-40479": "wp-029",
+        "district-40487": "wp-030",
+        "district-40517": "wp-059",
+        "district-40444": "wp-015",
+        "district-40461": "wp-059",
+        "district-40509": "wp-059",
+        "district-40495": "wp-059",
+        "district-40568": "wp-014",
+        "district-40576": "wp-018",
+        "district-40584": "wp-033",
+        "district-40592": "wp-049",
+        "district-40606": "wp-056",
+        "district-40525": "wp-006",
+        "district-40541": "wp-028",
+        "district-40550": "wp-050",
+        "district-40533": "wp-028",
+        "district-40614": "wp-016",
+        "district-40622": "wp-038",
+        "district-40631": "wp-052",
+        "district-40649": "wp-060",
+        "district-40703": "wp-002",
+        "district-40711": "wp-003",
+        "district-40681": "wp-057",
+        "district-40754": "wp-062",
+        "district-40720": "wp-003",
+        "district-40657": "wp-012",
+        "district-40665": "wp-019",
+        "district-40673": "wp-039",
+        "district-40690": "wp-065",
+        "district-40738": "wp-005",
+        "district-40746": "wp-013",
+        "district-40762": "wp-064",
+        "district-40827": "wp-026",
+        "district-40835": "wp-058",
+        "district-40843": "wp-061",
+        "district-40851": "wp-063",
+        "district-40771": "wp-017",
+        "district-40789": "wp-036",
+        "district-40797": "wp-044",
+        "district-40801": "wp-045",
+        "district-40819": "wp-053",
+        "district-40860": "wp-004",
+        "district-40878": "wp-011",
+        "district-40894": "wp-034",
+        "district-40908": "wp-037",
+        "district-40916": "wp-037",
+        "district-40886": "wp-037"
+      },
+      "workplaceRegionalAssignments": {
+        "wp-001": "region-praha",
+        "wp-beroun": "region-praha",
+        "wp-002": "region-brno",
+        "wp-003": "region-brno",
+        "wp-004": "region-opava",
+        "wp-005": "region-brno",
+        "wp-006": "region-hradec-kralove",
+        "wp-007": "region-ceske-budejovice",
+        "wp-008": "region-ceske-budejovice",
+        "wp-009": "region-usti-nad-labem",
+        "wp-010": "region-ceske-budejovice",
+        "wp-011": "region-opava",
+        "wp-012": "region-brno",
+        "wp-013": "region-brno",
+        "wp-014": "region-hradec-kralove",
+        "wp-015": "region-usti-nad-labem",
+        "wp-016": "region-hradec-kralove",
+        "wp-017": "region-olomouc",
+        "wp-018": "region-hradec-kralove",
+        "wp-019": "region-brno",
+        "wp-020": "region-ceske-budejovice",
+        "wp-021": "region-usti-nad-labem",
+        "wp-022": "region-praha",
+        "wp-023": "region-ceske-budejovice",
+        "wp-024": "region-praha",
+        "wp-026": "region-olomouc",
+        "wp-027": "region-praha",
+        "wp-028": "region-hradec-kralove",
+        "wp-029": "region-usti-nad-labem",
+        "wp-030": "region-usti-nad-labem",
+        "wp-031": "region-praha",
+        "wp-032": "region-praha",
+        "wp-033": "region-hradec-kralove",
+        "wp-034": "region-opava",
+        "wp-035": "region-praha",
+        "wp-036": "region-olomouc",
+        "wp-037": "region-opava",
+        "wp-038": "region-hradec-kralove",
+        "wp-039": "region-brno",
+        "wp-040": "region-ceske-budejovice",
+        "wp-041": "region-ceske-budejovice",
+        "wp-042": "region-praha",
+        "wp-043": "region-ceske-budejovice",
+        "wp-044": "region-olomouc",
+        "wp-045": "region-olomouc",
+        "wp-046": "region-praha",
+        "wp-047": "region-praha",
+        "wp-048": "region-ceske-budejovice",
+        "wp-049": "region-hradec-kralove",
+        "wp-050": "region-hradec-kralove",
+        "wp-051": "region-ceske-budejovice",
+        "wp-052": "region-hradec-kralove",
+        "wp-053": "region-olomouc",
+        "wp-054": "region-ceske-budejovice",
+        "wp-055": "region-ceske-budejovice",
+        "wp-056": "region-hradec-kralove",
+        "wp-057": "region-brno",
+        "wp-058": "region-olomouc",
+        "wp-059": "region-usti-nad-labem",
+        "wp-060": "region-hradec-kralove",
+        "wp-061": "region-olomouc",
+        "wp-062": "region-brno",
+        "wp-063": "region-olomouc",
+        "wp-064": "region-brno",
+        "wp-065": "region-brno"
+      },
+      "districtDisplayColors": {},
+      "workplaceDisplayColors": {},
+      "regionDisplayColors": {
+        "region-brno": "#70c95e",
+        "region-hradec-kralove": "#cc5624",
+        "region-opava": "#24b5e5",
+        "region-usti-nad-labem": "#74d2a6",
+        "region-ceske-budejovice": "#d9a926",
+        "region-olomouc": "#f3e762",
+        "region-praha": "#7d9bed"
+      }
+    },
+    "datasets": {
+      "datasets": [
+        {
+          "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+          "name": "Test",
+          "source": "manual",
+          "importedAt": "2026-07-08T19:35:59.931Z",
+          "status": "ready",
+          "columns": [
+            {
+              "id": "col-0",
+              "key": "column_1",
+              "name": "Hodnota",
+              "type": "number",
+              "nullable": true
+            },
+            {
+              "id": "col-1",
+              "key": "column_2",
+              "name": "Nový sloupec",
+              "type": "number",
+              "nullable": true
+            }
+          ],
+          "recordCount": 65,
+          "matchedCount": 65,
+          "unmatchedCount": 0,
+          "updatedAt": "2026-07-17T11:24:14.311Z",
+          "revision": 11,
+          "importSnapshot": {
+            "capturedAt": "2026-07-17T10:59:40.985Z",
+            "name": "Test",
+            "columns": [
+              {
+                "id": "col-0",
+                "key": "column_1",
+                "name": "Hodnota",
+                "type": "number",
+                "nullable": true
+              },
+              {
+                "id": "col-1",
+                "key": "column_2",
+                "name": "Nový sloupec",
+                "type": "number",
+                "nullable": true
+              }
+            ],
+            "records": [
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-1",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-001",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-2",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-002",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-3",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-003",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-4",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-004",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-5",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-005",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-6",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-006",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-7",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-007",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-8",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-008",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-9",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-009",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-10",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-010",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-11",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-011",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-12",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-012",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-13",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-013",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-14",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-014",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-15",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-015",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-16",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-016",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-17",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-017",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-18",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-018",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-19",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-019",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-20",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-020",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-21",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-021",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-22",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-022",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-23",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-023",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-24",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-024",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-25",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-025",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-26",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-026",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-27",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-027",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-28",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-028",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-29",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-029",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-30",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-030",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-31",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-031",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-32",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-032",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-33",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-033",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-34",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-034",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-35",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-035",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-36",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-036",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-37",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-037",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-38",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-038",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-39",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-039",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-40",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-040",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-41",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-041",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-42",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-042",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-43",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-043",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-44",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-044",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-45",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-045",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-46",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-046",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-47",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-047",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-48",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-048",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-49",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-049",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-50",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-050",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-51",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-051",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-52",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-052",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-53",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-053",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-54",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-054",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-55",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-055",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-56",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-056",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-57",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-057",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-58",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-058",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-59",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-059",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-60",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-060",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-61",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-061",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-62",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-062",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-63",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-063",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-64",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-064",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              },
+              {
+                "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-65",
+                "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+                "workplaceId": "wp-065",
+                "matchStatus": "matched",
+                "values": {
+                  "column_1": null,
+                  "column_2": null
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "recordsByDataset": {
+        "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24": [
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-1",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-001",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 50,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-2",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-002",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 51,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-3",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-003",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 20,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-4",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-004",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 25,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-5",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-005",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 52,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-6",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-006",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 40,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-7",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-007",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 6,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-8",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-008",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 7,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-9",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-009",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 8,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-10",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-010",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 9,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-11",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-011",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 7,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-12",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-012",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 4,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-13",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-013",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 25,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-14",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-014",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 55,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-15",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-015",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 40,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-16",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-016",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 50,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-17",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-017",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 70,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-18",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-018",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 2,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-19",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-019",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 30,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-20",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-020",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 20,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-21",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-021",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 20,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-22",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-022",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 55,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-23",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-023",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 70,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-24",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-024",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 100,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-26",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-026",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 20,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-27",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-027",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 40,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-28",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-028",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 15,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-29",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-029",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 66,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-30",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-030",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 70,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-31",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-031",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 33,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-32",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-032",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 35,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-33",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-033",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 39,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-34",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-034",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 28,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-35",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-035",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 77,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-36",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-036",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 25,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-37",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-037",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 25,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-38",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-038",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 36,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-39",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-039",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 54,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-40",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-040",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 70,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-41",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-041",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 80,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-42",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-042",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 66,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-43",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-043",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 65,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-44",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-044",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 62,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-45",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-045",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 63,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-46",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-046",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 60,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-47",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-047",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 65,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-48",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-048",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 59,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-49",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-049",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 58,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-50",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-050",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 52,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-51",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-051",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 55,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-52",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-052",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 51,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-53",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-053",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 50,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-54",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-054",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 50,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-55",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-055",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 52,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-56",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-056",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 52,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-57",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-057",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 54,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-58",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-058",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 40,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-59",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-059",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 52,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-60",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-060",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 35,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-61",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-061",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 36,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-62",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-062",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 38,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-63",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-063",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 80,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-64",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-064",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 50,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-5a6a-4a86-b74c-826c0be4d583-record-65",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-065",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 50,
+              "column_2": null
+            }
+          },
+          {
+            "id": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24-record-191e8a33-9eb7-4f3a-9a94-f1681a06a93e",
+            "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+            "workplaceId": "wp-beroun",
+            "matchStatus": "manual",
+            "values": {
+              "column_1": 40,
+              "column_2": null
+            }
+          }
+        ]
+      }
+    },
+    "map": {
+      "pluginId": "choropleth",
+      "datasetId": "dataset-7bce0685-6dbe-4fbb-a3ff-20abd09cbd24",
+      "columnKey": "column_1",
+      "themeId": "colorblind",
+      "boundaryVisibility": {
+        "district": false,
+        "workplace": true,
+        "region": false
+      },
+      "showLabels": true,
+      "labelScope": "workplace",
+      "labelVisibility": {
+        "showWorkplaceLabels": true,
+        "showRegionLabels": false,
+        "showDistrictLabels": false
+      },
+      "labelContentMode": "name-value",
+      "labelSizePreset": "small",
+      "labelFontSizePx": 7,
+      "labelFontSizes": {
+        "workplaceFontSizePx": 5,
+        "regionFontSizePx": 14,
+        "districtFontSizePx": 7
+      },
+      "labelHaloEnabled": false,
+      "labelHaloSettings": {
+        "workplace": {
+          "enabled": true,
+          "color": "#f8fafc",
+          "widthPx": 1
+        },
+        "region": {
+          "enabled": false,
+          "color": "#e2e8f0",
+          "widthPx": 1.5
+        },
+        "district": {
+          "enabled": false,
+          "color": "#ffffff",
+          "widthPx": 1
+        }
+      },
+      "labelHideOnCollision": false,
+      "labelEditMode": true,
+      "regionLabelEditMode": false,
+      "editorView": {
+        "zoom": 1,
+        "panX": 0,
+        "panY": 0
+      },
+      "organizationLegend": {
+        "enabled": true,
+        "labelMode": "leader-org-unit",
+        "position": "top-right",
+        "showWorkplaceCount": false,
+        "columnCount": 1,
+        "layout": {
+          "xPercent": 53,
+          "yPercent": 16,
+          "width": 120,
+          "height": 387,
+          "fontSizePx": 9,
+          "itemGapPx": 4,
+          "columnGapPx": 14,
+          "rowGapPx": 2,
+          "maxColumns": 4,
+          "backgroundMode": "transparent"
+        }
+      },
+      "activeExportPresetKey": "custom:a5a33d7a-4958-4af8-8d32-02ff5152a20f",
+      "focusedRegionId": null,
+      "regionViewMode": "overview"
+    },
+    "workplaceLabelOverrides": {
+      "version": 2,
+      "overrides": {
+        "wp-044": {
+          "workplaceId": "wp-044",
+          "offsetX": -3.5495588998443175,
+          "offsetY": -12.883031301482704,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:16.886Z"
+        },
+        "wp-037": {
+          "workplaceId": "wp-037",
+          "offsetX": 0.39439543331603516,
+          "offsetY": -8.33607907742998,
+          "manualPosition": true
+        },
+        "wp-018": {
+          "workplaceId": "wp-018",
+          "offsetX": -0.7887908666320705,
+          "offsetY": -1.5156507413509062,
+          "manualPosition": true
+        },
+        "wp-033": {
+          "workplaceId": "wp-033",
+          "offsetX": -3.5495588998443175,
+          "offsetY": 4.546952224052719,
+          "manualPosition": true
+        },
+        "wp-051": {
+          "workplaceId": "wp-051",
+          "offsetX": -2.3663725998962115,
+          "offsetY": 0.7578253706754531,
+          "manualPosition": true
+        },
+        "wp-007": {
+          "workplaceId": "wp-007",
+          "offsetX": -8.28230409963674,
+          "offsetY": 1.515650741350906,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:00.783Z"
+        },
+        "wp-043": {
+          "workplaceId": "wp-043",
+          "offsetX": -4.732745199792423,
+          "offsetY": -4.546952224052719,
+          "manualPosition": true
+        },
+        "wp-008": {
+          "workplaceId": "wp-008",
+          "offsetX": -3.155163466528282,
+          "offsetY": -3.7891268533772653,
+          "manualPosition": true
+        },
+        "wp-042": {
+          "workplaceId": "wp-042",
+          "offsetX": -2.3663725998962115,
+          "offsetY": -10.609555189456344,
+          "manualPosition": true
+        },
+        "wp-036": {
+          "workplaceId": "wp-036",
+          "offsetX": -3.5495588998443175,
+          "offsetY": -2.27347611202636,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:18.538Z"
+        },
+        "wp-050": {
+          "workplaceId": "wp-050",
+          "offsetX": 2.760768033212247,
+          "offsetY": 2.2734761120263594,
+          "manualPosition": true
+        },
+        "wp-021": {
+          "workplaceId": "wp-021",
+          "offsetX": 2.3663725998962115,
+          "offsetY": -6.062602965403626,
+          "manualPosition": true
+        },
+        "wp-041": {
+          "workplaceId": "wp-041",
+          "offsetX": -7.493513233004667,
+          "offsetY": -4.546952224052719,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:37.225Z"
+        },
+        "wp-032": {
+          "workplaceId": "wp-032",
+          "offsetX": 4.338349766476388,
+          "offsetY": -8.336079077429986,
+          "manualPosition": true
+        },
+        "wp-027": {
+          "workplaceId": "wp-027",
+          "offsetX": 2.817754296096495,
+          "offsetY": -0.28910789556478755,
+          "manualPosition": true
+        },
+        "wp-011": {
+          "workplaceId": "wp-011",
+          "offsetX": 0.39439543331603527,
+          "offsetY": -3.789126853377265,
+          "manualPosition": true
+        },
+        "wp-012": {
+          "workplaceId": "wp-012",
+          "offsetX": 1.5775817332641404,
+          "offsetY": -6.062602965403622,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:22:57.171Z"
+        },
+        "wp-020": {
+          "workplaceId": "wp-020",
+          "offsetX": -1.577581733264141,
+          "offsetY": -8.336079077429984,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:35.145Z"
+        },
+        "wp-030": {
+          "workplaceId": "wp-030",
+          "offsetX": -0.3943954333160354,
+          "offsetY": -3.7891268533772657,
+          "manualPosition": true
+        },
+        "wp-004": {
+          "workplaceId": "wp-004",
+          "offsetX": -3.5495588998443175,
+          "offsetY": 0.7578253706754531,
+          "manualPosition": true
+        },
+        "wp-058": {
+          "workplaceId": "wp-058",
+          "offsetX": 7.099117799688633,
+          "offsetY": 3.0313014827018114,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:10.927Z"
+        },
+        "wp-026": {
+          "workplaceId": "wp-026",
+          "offsetX": -13.409444732745193,
+          "offsetY": 6.062602965403625,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:14.899Z"
+        },
+        "wp-060": {
+          "workplaceId": "wp-060",
+          "offsetX": 1.577581733264141,
+          "offsetY": -3.7891268533772653,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:20.447Z"
+        },
+        "wp-049": {
+          "workplaceId": "wp-049",
+          "displayText": "Rychnov \nnad Kněžnou",
+          "offsetX": 6.3103269330565634,
+          "offsetY": -3.789126853377265,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:29.441Z"
+        },
+        "wp-beroun": {
+          "workplaceId": "wp-beroun",
+          "displayText": "Beroun",
+          "offsetX": 2.3663725998962115,
+          "offsetY": -6.0626029654036255,
+          "manualPosition": true,
+          "updatedAt": "2026-07-17T11:23:50.958Z"
+        }
+      }
+    },
+    "regionLabelOverrides": {
+      "version": 2,
+      "overrides": {
+        "region-brno": {
+          "regionId": "region-brno",
+          "offsetX": 2.3663725998962115,
+          "offsetY": -3.031301482701812,
+          "manualPosition": true
+        },
+        "region-ceske-budejovice": {
+          "regionId": "region-ceske-budejovice",
+          "offsetX": 11.437467566165013,
+          "offsetY": 24.2504118616145,
+          "manualPosition": true
+        },
+        "region-usti-nad-labem": {
+          "regionId": "region-usti-nad-labem",
+          "offsetX": -5.127140633108459,
+          "offsetY": 6.820428336079077,
+          "manualPosition": true
+        },
+        "region-hradec-kralove": {
+          "regionId": "region-hradec-kralove",
+          "offsetX": 8.282304099636738,
+          "offsetY": 2.220446049250313e-16,
+          "manualPosition": true
+        },
+        "region-opava": {
+          "regionId": "region-opava",
+          "offsetX": 7.099117799688632,
+          "offsetY": -0.7578253706754537,
+          "manualPosition": true
+        },
+        "region-praha": {
+          "regionId": "region-praha",
+          "offsetX": -3.155163466528282,
+          "offsetY": 4.546952224052719,
+          "manualPosition": true
+        }
+      }
+    },
+    "templates": [
+      {
+        "id": "aa570a85-757b-436e-a8ef-c412355ea65d",
+        "name": "mapa+název",
+        "presetId": "custom",
+        "quality": "standard",
+        "title": "Test — Hodnota",
+        "subtitle": "Barevná škála · Pro barvoslabé",
+        "showLegend": false,
+        "showDatasetInfo": true,
+        "showLabels": true,
+        "labelVisibility": {
+          "workplace": true,
+          "region": false,
+          "district": false
+        },
+        "labelFontSizes": {
+          "workplace": 5,
+          "region": 14,
+          "district": 7
+        },
+        "labelContentMode": "name-value",
+        "boundaryVisibility": {
+          "district": false,
+          "workplace": true,
+          "region": false
+        },
+        "pluginId": "choropleth",
+        "themeId": "colorblind",
+        "columnKey": "column_1",
+        "regionFocusEnabled": false,
+        "focusedRegionId": null,
+        "exportScope": "country",
+        "createdAt": "2026-07-17T11:25:53.252Z",
+        "updatedAt": "2026-07-17T11:25:53.252Z"
+      }
+    ],
+    "exportPresets": [
+      {
+        "id": "a5a33d7a-4958-4af8-8d32-02ff5152a20f",
+        "createdAt": "2026-07-17T11:35:32.042Z",
+        "updatedAt": "2026-07-17T11:35:32.042Z",
+        "name": "Mapa",
+        "width": 750,
+        "height": 500,
+        "mapSizeMode": "maximum",
+        "mapWidthPercent": 85,
+        "mapHeightPercent": 85,
+        "showTitle": true,
+        "showSubtitle": true,
+        "showLegend": false,
+        "showOrganizationLegend": false,
+        "showDatasetInfo": true,
+        "exportScope": "country",
+        "quality": "standard"
+      }
+    ]
+  }
+}

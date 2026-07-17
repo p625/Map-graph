@@ -1,4 +1,5 @@
 import type { Leader, OrgUnit, OrganizationWorkplace } from '../organization/types'
+import type { SupervisionPlan, SupervisionYearFilter } from '../supervision-plan/types'
 import type { RegionScope } from '../region/types'
 import type {
   DistrictWorkplaceAssignments,
@@ -55,6 +56,7 @@ export interface VisualizationContext {
     orgUnits: OrgUnit[]
     workplaces: OrganizationWorkplace[]
   }
+  supervisionPlan?: SupervisionPlan & { yearFilter?: SupervisionYearFilter }
   regionScope?: RegionScope
   dataset?: Dataset
   records?: DatasetRecord[]

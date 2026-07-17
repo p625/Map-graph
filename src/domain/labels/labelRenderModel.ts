@@ -1,4 +1,4 @@
-import type { MapLabel } from './labelEngine'
+import type { MapLabel, LabelContentMode } from './labelEngine'
 import { composeLabelText } from './labelContent'
 
 export interface RenderedMapLabel {
@@ -11,14 +11,14 @@ export interface RenderedMapLabel {
   finalY: number
   nameLines: string[]
   valueText?: string | null
-  contentMode: 'name' | 'value' | 'name-value'
+  contentMode: LabelContentMode
   fontSizePx: number
   manualPosition: boolean
   style: MapLabel['style']
   visible: boolean
 }
 
-function inferContentMode(label: MapLabel): 'name' | 'value' | 'name-value' {
+function inferContentMode(label: MapLabel): LabelContentMode {
   if (label.contentMode) return label.contentMode
   if (label.valueText) {
     const name = (label.nameLines ?? []).join('\n')

@@ -33,9 +33,11 @@ import {
 import {
   composeLabelText,
   resolveLabelNameLines,
+  resolveSupervisionYearText,
   resolveWorkplaceValueText,
   splitDisplayName,
 } from './labelContent'
+import { getPlannedYear } from '../supervision-plan/supervisionPlanSummary'
 
 export type { MapLabelHaloSettings, LabelHaloStyle } from './labelHaloSettings'
 export { DEFAULT_LABEL_HALO_SETTINGS, sanitizeLabelHaloSettings } from './labelHaloSettings'
@@ -60,7 +62,12 @@ export {
 } from './labelSettings'
 
 export type LabelScope = 'none' | 'district' | 'workplace' | 'region'
-export type LabelContentMode = 'name' | 'value' | 'name-value'
+export type LabelContentMode =
+  | 'name'
+  | 'value'
+  | 'name-value'
+  | 'supervision-year'
+  | 'supervision-name-year'
 export type LabelSizePreset = 'small' | 'medium' | 'large'
 
 export const LABEL_FONT_SIZE_MIN = WORKPLACE_FONT_MIN
@@ -221,6 +228,20 @@ function resolveWorkplaceValue(
   const value = getNumericColumnValue(record, context.column.key)
   if (value === null) return null
   return formatValue(value, context.column.type)
+}
+
+function resolveWorkplaceLabelValueText(
+  input: LabelEngineInput,
+  workplaceId: string,
+  contentMode: LabelContentMode,
+  datasetValue: string | null,
+): string | null {
+  if (contentMode === 'supervision-year' || contentMode === 'supervision-name-year') {
+    const plan = input.context?.supervisionPlan
+    if (!plan) return null
+    return resolveSupervisionYearText(contentMode, getPlannedYear(plan, workplaceId))
+  }
+  return resolveWorkplaceValueText(contentMode, datasetValue)
 }
 
 function buildLabelText(
@@ -431,7 +452,7 @@ function buildWorkplaceLabels(
     const override = overrides[workplace.id]
     const defaultName = resolver.getDisplayName(workplace.id)
     const datasetValue = resolveWorkplaceValue(input.context, workplace.id)
-    const valueText = resolveWorkplaceValueText(contentMode, datasetValue)
+    const valueText = resolveWorkplaceLabelValueText(input, workplace.id, contentMode, datasetValue)
     const nameLines = resolveLabelNameLines(override?.displayText, defaultName)
     const text = buildLabelText(nameLines, contentMode, valueText)
 
