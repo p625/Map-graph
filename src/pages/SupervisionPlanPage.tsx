@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { SupervisionPlanImportDialog } from '../components/supervision-plan/SupervisionPlanImportDialog'
 import { SupervisionPlanSummaryPanel } from '../components/supervision-plan/SupervisionPlanSummary'
 import { SupervisionPlanTable } from '../components/supervision-plan/SupervisionPlanTable'
 import { SupervisionPlanYearSettings } from '../components/supervision-plan/SupervisionPlanYearSettings'
@@ -7,7 +8,18 @@ import {
   buildSupervisionPlanCsvContent,
   exportSupervisionPlanXlsx,
 } from '../domain/supervision-plan/supervisionPlanExport'
-import { computeSupervisionPlanSummary } from '../domain/supervision-plan/supervisionPlanSummary'
+import {
+  buildSupervisionPlanExportFile,
+  buildSupervisionPlanExportFilename,
+  serializeSupervisionPlanExportFile,
+} from '../domain/supervision-plan/io/supervision-plan-export'
+import {
+  reconcileSupervisionYearFilterAfterImport,
+} from '../domain/supervision-plan/io/supervision-plan-import'
+import type {
+  SupervisionPlanImportMode,
+  SupervisionPlanImportPreview,
+} from '../domain/supervision-plan/io/supervision-plan-schema'
 import {
   buildSupervisionPlanTableRows,
   defaultSupervisionPlanFilters,
@@ -21,15 +33,20 @@ import {
   countWorkplacesForYear,
   useSupervisionPlan,
   useSupervisionPlanActions,
+  useSupervisionPlanImportActions,
 } from '../store/supervisionPlanStore'
-import { useMapActions } from '../store/mapStore'
+import { useMapActions, useMapState } from '../store/mapStore'
+import { computeSupervisionPlanSummary } from '../domain/supervision-plan/supervisionPlanSummary'
+import { downloadTextFile } from '../utils/downloadTextFile'
 
 export function SupervisionPlanPage() {
   const snapshot = useOrganizationSnapshot()
   const plan = useSupervisionPlan()
   const actions = useSupervisionPlanActions()
+  const { importPlan, undoLastImport, canUndoImport } = useSupervisionPlanImportActions()
   const { notify } = useNotifications()
-  const { setPlugin } = useMapActions()
+  const { setPlugin, setSupervisionYearFilter } = useMapActions()
+  const { pluginId, supervisionYearFilter } = useMapState()
   const navigate = useNavigate()
   const synced = isOrganizationSynced(snapshot)
 
@@ -40,6 +57,7 @@ export function SupervisionPlanPage() {
   const [newYearInput, setNewYearInput] = useState('')
   const [showYearSettings, setShowYearSettings] = useState(false)
   const [savedFlash, setSavedFlash] = useState(false)
+  const [importDialogOpen, setImportDialogOpen] = useState(false)
 
   const activeWorkplaces = useMemo(
     () => snapshot.workplaces.filter((wp) => !wp.absentFromSync),
@@ -68,6 +86,57 @@ export function SupervisionPlanPage() {
   function flashSaved() {
     setSavedFlash(true)
     window.setTimeout(() => setSavedFlash(false), 1500)
+  }
+
+  function handleExportJson() {
+    const exportFile = buildSupervisionPlanExportFile(plan, snapshot, '0.0.0')
+    const filename = buildSupervisionPlanExportFilename(plan)
+    downloadTextFile(
+      serializeSupervisionPlanExportFile(exportFile),
+      filename,
+      'application/json;charset=utf-8',
+    )
+    notify({
+      type: 'success',
+      title: 'Plán supervizí byl exportován',
+      message: 'JSON soubor byl stažen.',
+    })
+  }
+
+  function handleImportConfirm(preview: SupervisionPlanImportPreview, mode: SupervisionPlanImportMode) {
+    const activeIds = activeWorkplaces.map((wp) => wp.id)
+    const { report, plan: nextPlan } = importPlan(preview, mode, activeIds)
+    setImportDialogOpen(false)
+
+    const { filter, resetReason } = reconcileSupervisionYearFilterAfterImport(
+      supervisionYearFilter,
+      nextPlan,
+    )
+    if (pluginId === 'supervision-plan' && filter !== supervisionYearFilter) {
+      setSupervisionYearFilter(filter)
+    }
+
+    const unknownCount = report.ignoredUnknownWorkplaceIds.length
+    notify({
+      type: 'success',
+      title: 'Plán byl importován',
+      message: [
+        `Importováno ${report.importedAssignmentCount} přiřazení (${mode === 'replace' ? 'nahrazení' : 'sloučení'}).`,
+        unknownCount > 0 ? `Ignorováno ${unknownCount} neznámých pracovišť.` : '',
+        resetReason ?? '',
+        'Použijte tlačítko Vrátit import pro obnovu předchozího plánu.',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    })
+    flashSaved()
+  }
+
+  function handleUndoImport() {
+    if (undoLastImport()) {
+      notify({ type: 'info', title: 'Import vrácen', message: 'Obnoven plán před posledním importem.' })
+      flashSaved()
+    }
   }
 
   function handleAssignYear(workplaceIds: string[], year: number | null) {
@@ -366,6 +435,30 @@ export function SupervisionPlanPage() {
         >
           Export CSV
         </button>
+        <span className="mx-1 hidden h-6 w-px bg-slate-200 sm:inline-block" aria-hidden />
+        <button
+          type="button"
+          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+          onClick={handleExportJson}
+        >
+          Exportovat JSON
+        </button>
+        <button
+          type="button"
+          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+          onClick={() => setImportDialogOpen(true)}
+        >
+          Importovat JSON
+        </button>
+        {canUndoImport && (
+          <button
+            type="button"
+            className="rounded-md border border-amber-300 px-3 py-1.5 text-sm text-amber-900 hover:bg-amber-50"
+            onClick={handleUndoImport}
+          >
+            Vrátit import
+          </button>
+        )}
         <button
           type="button"
           className="rounded-md border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
@@ -395,6 +488,14 @@ export function SupervisionPlanPage() {
           flashSaved()
         }}
         onSort={handleSort}
+      />
+
+      <SupervisionPlanImportDialog
+        open={importDialogOpen}
+        currentPlan={plan}
+        activeWorkplaceIds={activeWorkplaces.map((wp) => wp.id)}
+        onClose={() => setImportDialogOpen(false)}
+        onConfirm={handleImportConfirm}
       />
     </div>
   )

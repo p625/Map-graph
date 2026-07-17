@@ -4,9 +4,17 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
+  useState,
   type Dispatch,
   type ReactNode,
 } from 'react'
+import { applySupervisionPlanImport } from '../domain/supervision-plan/io/supervision-plan-import'
+import type {
+  SupervisionPlanImportApplyReport,
+  SupervisionPlanImportMode,
+  SupervisionPlanImportPreview,
+} from '../domain/supervision-plan/io/supervision-plan-schema'
 import { createDefaultSupervisionPlan } from '../domain/supervision-plan/supervisionPlanDefaults'
 import { sanitizeSupervisionPlan } from '../domain/supervision-plan/supervisionPlanSanitize'
 import { syncSupervisionPlanWithOrganization } from '../domain/supervision-plan/syncWithOrganization'
@@ -126,10 +134,24 @@ function loadInitialPlan(): SupervisionPlan {
 const SupervisionPlanContext = createContext<SupervisionPlan | null>(null)
 const SupervisionPlanDispatchContext = createContext<Dispatch<SupervisionPlanAction> | null>(null)
 
+interface SupervisionPlanImportContextValue {
+  canUndoImport: boolean
+  importPlan: (
+    preview: SupervisionPlanImportPreview,
+    mode: SupervisionPlanImportMode,
+    activeWorkplaceIds: string[],
+  ) => { report: SupervisionPlanImportApplyReport; plan: SupervisionPlan }
+  undoLastImport: () => boolean
+}
+
+const SupervisionPlanImportContext = createContext<SupervisionPlanImportContextValue | null>(null)
+
 export function SupervisionPlanProvider({ children }: { children: ReactNode }) {
   const [plan, dispatch] = useReducer(supervisionPlanReducer, undefined, loadInitialPlan)
   const snapshot = useOrganizationSnapshot()
   const { notify } = useNotifications()
+  const undoPlanRef = useRef<SupervisionPlan | null>(null)
+  const [canUndoImport, setCanUndoImport] = useState(false)
 
   useEffect(() => {
     const active = snapshot.workplaces.filter((wp) => !wp.absentFromSync)
@@ -150,9 +172,39 @@ export function SupervisionPlanProvider({ children }: { children: ReactNode }) {
     }
   }, [plan, notify])
 
+  const importContextValue = useMemo<SupervisionPlanImportContextValue>(
+    () => ({
+      canUndoImport,
+      importPlan: (preview, mode, activeWorkplaceIds) => {
+        const { plan: nextPlan, report } = applySupervisionPlanImport(
+          mode,
+          plan,
+          preview.file,
+          activeWorkplaceIds,
+        )
+        undoPlanRef.current = plan
+        setCanUndoImport(true)
+        dispatch({ type: 'replace', plan: nextPlan })
+        return { report, plan: nextPlan }
+      },
+      undoLastImport: () => {
+        if (!undoPlanRef.current) return false
+        dispatch({ type: 'replace', plan: undoPlanRef.current })
+        undoPlanRef.current = null
+        setCanUndoImport(false)
+        return true
+      },
+    }),
+    [canUndoImport, plan],
+  )
+
   return (
     <SupervisionPlanContext.Provider value={plan}>
-      <SupervisionPlanDispatchContext.Provider value={dispatch}>{children}</SupervisionPlanDispatchContext.Provider>
+      <SupervisionPlanDispatchContext.Provider value={dispatch}>
+        <SupervisionPlanImportContext.Provider value={importContextValue}>
+          {children}
+        </SupervisionPlanImportContext.Provider>
+      </SupervisionPlanDispatchContext.Provider>
     </SupervisionPlanContext.Provider>
   )
 }
@@ -186,4 +238,12 @@ export function useSupervisionPlanActions() {
 
 export function countWorkplacesForYear(plan: SupervisionPlan, year: number): number {
   return Object.values(plan.assignments).filter((a) => a.plannedYear === year).length
+}
+
+export function useSupervisionPlanImportActions() {
+  const context = useContext(SupervisionPlanImportContext)
+  if (!context) {
+    throw new Error('useSupervisionPlanImportActions must be used within SupervisionPlanProvider')
+  }
+  return context
 }
