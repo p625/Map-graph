@@ -11,6 +11,7 @@ import { useMapActions, useMapState } from '../../store/mapStore'
 import { useSupervisionPlan } from '../../store/supervisionPlanStore'
 import type { SupervisionYearFilter } from '../../domain/supervision-plan/types'
 import { MapGuardBanner } from './MapGuardBanner'
+import { ColorThemeSelect } from '../../features/map-editor/color-theme/ColorThemeSelect'
 import { ThemeSelector } from './ThemeSelector'
 
 export function MapControls() {
@@ -68,7 +69,7 @@ export function MapControls() {
           </select>
         </label>
 
-        <ThemeSelector />
+        {pluginId === 'choropleth' ? <ColorThemeSelect /> : <ThemeSelector />}
 
         {plugin?.requiresDataset && (
           <label className="space-y-1 text-sm">

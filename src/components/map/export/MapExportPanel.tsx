@@ -18,6 +18,8 @@ import { isRegionFocused } from '../../../domain/region/regionScope'
 import { visualizationRegistry } from '../../../domain/visualization/VisualizationRegistry'
 import { useActiveVisualization } from '../../../hooks/useVisualization'
 import { useRegionScope } from '../../../hooks/useRegionScope'
+import { resolveTemplateColorThemeId } from '../../../domain/color-themes/colorThemeRegistry'
+import { useCustomColorThemes } from '../../../store/customColorThemesStore'
 import { useMapActions, useMapState } from '../../../store/mapStore'
 import { useNotifications } from '../../../store/notificationStore'
 import { TemplateManager } from '../TemplateManager'
@@ -49,6 +51,7 @@ export interface MapTemplateApplyPayload {
   settings: MapExportSettings
   pluginId?: string
   themeId?: string
+  colorThemeId?: string
   columnKey?: string | null
   regionFocusEnabled?: boolean
   focusedRegionId?: string | null
@@ -90,6 +93,7 @@ export function MapExportPanel({
     boundaryVisibility: mapBoundaries,
     pluginId: mapPluginId,
     themeId: mapThemeId,
+    colorThemeId: mapColorThemeId,
     columnKey: mapColumnKey,
     organizationLegend,
     activeExportPresetKey,
@@ -97,6 +101,7 @@ export function MapExportPanel({
   const {
     setPlugin,
     setTheme,
+    setColorTheme,
     setColumn,
     setBoundaryVisibility,
     setShowLabels,
@@ -201,10 +206,23 @@ export function MapExportPanel({
     return filterLegendForRegion(base, activePlugin.id, context.regionScope, context)
   }, [context, mapPluginId, plugin, _interactiveLegend])
 
+  const { customThemes } = useCustomColorThemes()
+
   function handleApplyTemplate(payload: MapTemplateApplyPayload) {
     setSettings(payload.settings)
     if (payload.pluginId) setPlugin(payload.pluginId)
     if (payload.themeId) setTheme(payload.themeId)
+    if (payload.colorThemeId) {
+      const resolved = resolveTemplateColorThemeId(payload.colorThemeId, customThemes)
+      setColorTheme(resolved.colorThemeId)
+      if (resolved.usedFallback) {
+        notify({
+          type: 'info',
+          title: 'Barevné téma',
+          message: 'Původní barevné téma již není dostupné. Bylo použito výchozí téma.',
+        })
+      }
+    }
     if (payload.columnKey !== undefined) setColumn(payload.columnKey)
     setBoundaryVisibility(payload.settings.boundaryVisibility)
     setShowLabels(payload.settings.showLabels)
@@ -594,6 +612,7 @@ export function MapExportPanel({
             settings={settings}
             pluginId={mapPluginId}
             themeId={mapThemeId}
+            colorThemeId={mapColorThemeId}
             columnKey={mapColumnKey}
             defaultTitle={defaultTitle}
             defaultSubtitle={defaultSubtitle}

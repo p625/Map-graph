@@ -11,6 +11,7 @@ import { WorkplaceLabelOverridesProvider } from './store/workplaceLabelOverrides
 import { NotificationProvider } from './store/notificationStore.tsx'
 import { OrganizationProvider } from './store/organizationStore.tsx'
 import { SupervisionPlanProvider } from './store/supervisionPlanStore.tsx'
+import { CustomColorThemesProvider } from './store/customColorThemesStore.tsx'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -22,13 +23,15 @@ createRoot(document.getElementById('root')!).render(
             <ConfigProvider>
               <AssignmentConfigBridge />
               <DatasetProvider>
-                <MapProvider>
-                  <RegionLabelOverridesProvider>
-                    <WorkplaceLabelOverridesProvider>
-                      <App />
-                    </WorkplaceLabelOverridesProvider>
-                  </RegionLabelOverridesProvider>
-                </MapProvider>
+                <CustomColorThemesProvider>
+                  <MapProvider>
+                    <RegionLabelOverridesProvider>
+                      <WorkplaceLabelOverridesProvider>
+                        <App />
+                      </WorkplaceLabelOverridesProvider>
+                    </RegionLabelOverridesProvider>
+                  </MapProvider>
+                </CustomColorThemesProvider>
               </DatasetProvider>
             </ConfigProvider>
           </SupervisionPlanProvider>

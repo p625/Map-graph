@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
 import { districts } from '../data/seed/districts'
+import { resolveActiveColorTheme } from '../domain/color-themes/colorThemeRegistry'
 import { filterLegendForRegion, applyRegionFocusColors } from '../domain/region/regionFocus'
 import { getThemeById } from '../domain/visualization/themes'
 import type { VisualizationContext } from '../domain/visualization/types'
 import { visualizationRegistry } from '../domain/visualization/VisualizationRegistry'
+import { useCustomColorThemes } from '../store/customColorThemesStore'
 import { useConfigData, useConfigState } from '../store/configStore'
 import { isOrganizationSynced } from '../store/organizationStore'
 import { useActiveDataset } from '../store/datasetStore'
@@ -14,9 +16,21 @@ import { useRegionScope } from './useRegionScope'
 export function useVisualizationContext(): VisualizationContext {
   const config = useConfigState()
   const { workplaces, regionalOffices, organizationSnapshot } = useConfigData()
-  const { datasetId, columnKey, themeId, pluginId, supervisionYearFilter } = useMapState()
+  const { datasetId, columnKey, themeId, colorThemeId, pluginId, supervisionYearFilter } = useMapState()
   const { dataset, records } = useActiveDataset(datasetId)
-  const theme = getThemeById(themeId)
+  const baseTheme = getThemeById(themeId)
+  const { customThemes, draftGradient } = useCustomColorThemes()
+  const resolvedColorTheme = resolveActiveColorTheme(colorThemeId, customThemes, draftGradient)
+  const theme = useMemo(
+    () => ({
+      ...baseTheme,
+      sequentialScale: resolvedColorTheme.sequentialScale,
+      colorStops: resolvedColorTheme.stops,
+      colorThemeId: resolvedColorTheme.id,
+      colorThemeName: resolvedColorTheme.name,
+    }),
+    [baseTheme, resolvedColorTheme],
+  )
   const orgSynced = isOrganizationSynced(organizationSnapshot)
   const regionScope = useRegionScope()
   const supervisionPlanData = useSupervisionPlan()

@@ -57,3 +57,27 @@ export function getScopedDistricts(context: VisualizationContext): District[] {
   }
   return context.districts.filter((district) => scope.districtIds.has(district.id))
 }
+
+export function getDatasetNumericRange(
+  context: VisualizationContext,
+): { min: number; max: number; hasValues: boolean } {
+  const columnKey = context.column?.key
+  const scopedDistricts = getScopedDistricts(context)
+  const values: number[] = []
+
+  for (const district of scopedDistricts) {
+    const record = getRecordForDistrict(context, district.id)
+    const value = getNumericColumnValue(record, columnKey)
+    if (value !== null) values.push(value)
+  }
+
+  if (values.length === 0) {
+    return { min: 0, max: 0, hasValues: false }
+  }
+
+  return {
+    min: Math.min(...values),
+    max: Math.max(...values),
+    hasValues: true,
+  }
+}

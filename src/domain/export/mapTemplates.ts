@@ -85,6 +85,7 @@ export interface MapTemplate {
   boundaryVisibility: BoundaryVisibility
   pluginId?: string
   themeId?: string
+  colorThemeId?: string
   columnKey?: string | null
   regionFocusEnabled?: boolean
   focusedRegionId?: string | null

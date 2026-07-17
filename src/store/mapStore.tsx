@@ -8,6 +8,10 @@ import {
   type ReactNode,
 } from 'react'
 import { defaultThemeId } from '../domain/visualization/themes'
+import {
+  getFallbackColorThemeId,
+  resolveColorThemeIdFromLegacy,
+} from '../domain/color-themes/colorThemeRegistry'
 import type { LabelContentMode, LabelScope, LabelSizePreset } from '../domain/labels/labelEngine'
 import {
   DEFAULT_LABEL_FONT_SIZE_PX,
@@ -58,6 +62,7 @@ interface MapState {
   datasetId: string | null
   columnKey: string | null
   themeId: string
+  colorThemeId: string
   hoveredPolygon: HoveredPolygon | null
   boundaryVisibility: BoundaryVisibility
   showLabels: boolean
@@ -89,6 +94,7 @@ type MapAction =
   | { type: 'set-dataset'; datasetId: string | null }
   | { type: 'set-column'; columnKey: string | null }
   | { type: 'set-theme'; themeId: string }
+  | { type: 'set-color-theme'; colorThemeId: string }
   | { type: 'set-hovered-polygon'; polygon: HoveredPolygon | null }
   | { type: 'set-boundary-visibility'; visibility: BoundaryVisibility }
   | { type: 'toggle-boundary'; level: keyof BoundaryVisibility }
@@ -126,6 +132,7 @@ const initialState: MapState = {
   datasetId: null,
   columnKey: null,
   themeId: defaultThemeId,
+  colorThemeId: getFallbackColorThemeId(),
   hoveredPolygon: null,
   boundaryVisibility: DEFAULT_BOUNDARY_VISIBILITY,
   showLabels: true,
@@ -190,6 +197,10 @@ function loadInitialMapState(): MapState {
     focusedRegionId: stored.focusedRegionId ?? null,
     regionViewMode: stored.regionViewMode ?? 'overview',
     supervisionYearFilter: stored.supervisionYearFilter ?? 'all',
+    colorThemeId:
+      typeof stored.colorThemeId === 'string'
+        ? stored.colorThemeId
+        : resolveColorThemeIdFromLegacy(stored.themeId ?? defaultThemeId),
   }
 }
 
@@ -203,6 +214,8 @@ function mapReducer(state: MapState, action: MapAction): MapState {
       return { ...state, columnKey: action.columnKey }
     case 'set-theme':
       return { ...state, themeId: action.themeId }
+    case 'set-color-theme':
+      return { ...state, colorThemeId: action.colorThemeId }
     case 'set-hovered-polygon':
       return { ...state, hoveredPolygon: action.polygon }
     case 'set-boundary-visibility':
@@ -411,6 +424,7 @@ export function MapProvider({ children }: { children: ReactNode }) {
       datasetId: state.datasetId,
       columnKey: state.columnKey,
       themeId: state.themeId,
+      colorThemeId: state.colorThemeId,
       boundaryVisibility: state.boundaryVisibility,
       showLabels: state.showLabels,
       labelScope: state.labelScope,
@@ -436,6 +450,7 @@ export function MapProvider({ children }: { children: ReactNode }) {
     state.datasetId,
     state.columnKey,
     state.themeId,
+    state.colorThemeId,
     state.boundaryVisibility,
     state.showLabels,
     state.labelScope,
@@ -484,6 +499,7 @@ export function useMapActions() {
       setDataset: (datasetId: string | null) => dispatch({ type: 'set-dataset', datasetId }),
       setColumn: (columnKey: string | null) => dispatch({ type: 'set-column', columnKey }),
       setTheme: (themeId: string) => dispatch({ type: 'set-theme', themeId }),
+      setColorTheme: (colorThemeId: string) => dispatch({ type: 'set-color-theme', colorThemeId }),
       setHoveredPolygon: (polygon: HoveredPolygon) =>
         dispatch({ type: 'set-hovered-polygon', polygon }),
       clearHoveredPolygon: () => dispatch({ type: 'set-hovered-polygon', polygon: null }),

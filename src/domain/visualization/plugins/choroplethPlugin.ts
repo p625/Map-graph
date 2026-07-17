@@ -1,4 +1,5 @@
 import type { VisualizationPlugin } from '../types'
+import { interpolateColorWithStops } from '../../color-themes/colorInterpolation'
 import { interpolateColor } from '../colorUtils'
 import {
   createEmptyColorMap,
@@ -18,6 +19,7 @@ export const choroplethPlugin: VisualizationPlugin = {
     const colors = createEmptyColorMap(context)
     const columnKey = context.column?.key
     const scale = context.theme.sequentialScale
+    const colorStops = context.theme.colorStops
     const noData = context.theme.noDataFill
     const scopedDistricts = getScopedDistricts(context)
     const values: number[] = []
@@ -35,7 +37,12 @@ export const choroplethPlugin: VisualizationPlugin = {
       const record = getRecordForDistrict(context, district.id)
       const value = getNumericColumnValue(record, columnKey)
       colors[district.id] = {
-        fill: value === null ? noData : interpolateColor(min, max, value, scale),
+        fill:
+          value === null
+            ? noData
+            : colorStops
+              ? interpolateColorWithStops(min, max, value, colorStops)
+              : interpolateColor(min, max, value, scale),
       }
     }
 

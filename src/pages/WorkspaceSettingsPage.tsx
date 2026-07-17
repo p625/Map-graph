@@ -24,6 +24,7 @@ const moduleLabels: Record<WorkspaceModuleKey, string> = {
   workplaceLabelOverrides: 'Popisky pracovišť',
   regionLabelOverrides: 'Popisky regionů',
   supervisionPlan: 'Plán supervizí',
+  customColorThemes: 'Vlastní barevná témata',
   templates: 'Šablony',
   exportPresets: 'Exportní presety',
 }

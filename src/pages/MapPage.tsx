@@ -25,6 +25,8 @@ import { useMapActions, useMapState } from '../store/mapStore'
 import { useSupervisionPlan } from '../store/supervisionPlanStore'
 import { useRegionLabelOverrides } from '../store/regionLabelOverridesStore'
 import { useWorkplaceLabelOverrides } from '../store/workplaceLabelOverridesStore'
+import { CustomGradientEditor } from '../features/map-editor/color-theme/CustomGradientEditor'
+import { useCustomColorThemes } from '../store/customColorThemesStore'
 import { cn } from '../utils/cn'
 
 type MapViewMode = 'interactive' | 'export'
@@ -79,6 +81,8 @@ export function MapPage() {
 
   const organizationLegendItems = useOrganizationLegendItems(organizationLegend)
   const supervisionPlan = useSupervisionPlan()
+  const { isGradientEditorOpen } = useCustomColorThemes()
+  const showGradientEditor = plugin.id === 'choropleth' && isGradientEditorOpen
 
   const mapWidth = MAP_LOGICAL_WIDTH
   const mapHeight = MAP_LOGICAL_HEIGHT
@@ -373,6 +377,7 @@ export function MapPage() {
             />
           </div>
           <div className="space-y-4">
+            {showGradientEditor && <CustomGradientEditor context={context} />}
             <MapBoundaryControls hasDataColumn={Boolean(context.column)} />
             <MapLegend legend={legend} />
             <MapHoverPanel resolver={resolver} districtInteraction={districtInteraction} />

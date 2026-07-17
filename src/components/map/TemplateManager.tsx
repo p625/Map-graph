@@ -9,13 +9,17 @@ import {
   templateFontSizesToDomain,
   templateVisibilityToDomain,
 } from '../../domain/export/mapTemplates'
+import { CUSTOM_DRAFT_COLOR_THEME_ID } from '../../domain/color-themes/types'
 import type { MapExportSettings, MapTemplateApplyPayload } from './export/MapExportPanel'
+import { useCustomColorThemes } from '../../store/customColorThemesStore'
 import { useMapState } from '../../store/mapStore'
+import { useNotifications } from '../../store/notificationStore'
 
 interface TemplateManagerProps {
   settings: MapExportSettings
   pluginId: string
   themeId: string
+  colorThemeId: string
   columnKey: string | null
   defaultTitle: string
   defaultSubtitle: string
@@ -49,6 +53,7 @@ function templateToPayload(
     },
     pluginId: resolved.pluginId,
     themeId: resolved.themeId,
+    colorThemeId: resolved.colorThemeId,
     columnKey: resolved.columnKey,
     regionFocusEnabled: resolved.regionFocusEnabled,
     focusedRegionId: resolved.focusedRegionId,
@@ -58,7 +63,7 @@ function templateToPayload(
 function settingsToTemplate(
   settings: MapExportSettings,
   name: string,
-  visualization: { pluginId: string; themeId: string; columnKey: string | null },
+  visualization: { pluginId: string; themeId: string; colorThemeId: string; columnKey: string | null },
   regionFocus: { enabled: boolean; focusedRegionId: string | null },
   existing?: MapTemplate,
 ): MapTemplate {
@@ -79,6 +84,7 @@ function settingsToTemplate(
     boundaryVisibility: settings.boundaryVisibility,
     pluginId: visualization.pluginId,
     themeId: visualization.themeId,
+    colorThemeId: visualization.colorThemeId,
     columnKey: visualization.columnKey,
     regionFocusEnabled: regionFocus.enabled,
     focusedRegionId: regionFocus.focusedRegionId,
@@ -92,12 +98,15 @@ export function TemplateManager({
   settings,
   pluginId,
   themeId,
+  colorThemeId,
   columnKey,
   defaultTitle,
   defaultSubtitle,
   onApply,
 }: TemplateManagerProps) {
   const { focusedRegionId, regionViewMode } = useMapState()
+  const { notify } = useNotifications()
+  const { isGradientEditorOpen } = useCustomColorThemes()
   const [templates, setTemplates] = useState<MapTemplate[]>(() => loadMapTemplates())
   const [selectedId, setSelectedId] = useState<string>('')
   const [templateName, setTemplateName] = useState('')
@@ -118,12 +127,22 @@ export function TemplateManager({
   }
 
   function handleSave() {
+    if (colorThemeId === CUSTOM_DRAFT_COLOR_THEME_ID || isGradientEditorOpen) {
+      notify({
+        type: 'warning',
+        title: 'Uložte barevné téma',
+        message:
+          'Tento vlastní gradient zatím není uložený. Před uložením šablony jej uložte jako barevné téma.',
+      })
+      return
+    }
+
     const name = templateName.trim() || `Šablona ${templates.length + 1}`
     const existing = templates.find((template) => template.name === name)
     const nextTemplate = settingsToTemplate(
       settings,
       name,
-      { pluginId, themeId, columnKey },
+      { pluginId, themeId, colorThemeId, columnKey },
       {
         enabled: regionViewMode === 'focused' && Boolean(focusedRegionId),
         focusedRegionId,
