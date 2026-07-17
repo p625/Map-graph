@@ -1,7 +1,8 @@
 import { forwardRef } from 'react'
 import { computeExportLayout } from '../../../domain/export/exportMapLayout'
 import type { ExportMapSizing } from '../../../domain/export/exportMapLayout'
-import type { LabelContentMode, LabelScope } from '../../../domain/labels/labelEngine'
+import type { LabelContentMode } from '../../../domain/labels/labelEngine'
+import type { MapLabelFontSizes, MapLabelVisibility } from '../../../domain/labels/labelSettings'
 import type { BoundaryVisibility } from '../../../domain/territory/types'
 import type { Dataset } from '../../../domain/types/dataset'
 import type { DatasetColumn } from '../../../domain/types/datasetColumn'
@@ -25,7 +26,8 @@ export interface ExportMapLayoutProps {
   showLegend: boolean
   showDatasetInfo: boolean
   showLabels: boolean
-  labelScope: LabelScope
+  labelVisibility?: MapLabelVisibility
+  labelFontSizes?: MapLabelFontSizes
   labelContentMode?: LabelContentMode
   boundaryVisibility: BoundaryVisibility
   context?: VisualizationContext
@@ -54,7 +56,8 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
       showLegend,
       showDatasetInfo,
       showLabels,
-      labelScope,
+      labelVisibility,
+      labelFontSizes,
       labelContentMode = 'name',
       boundaryVisibility,
       context,
@@ -103,7 +106,8 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
       strokeColor,
       boundaryVisibility,
       showLabels,
-      labelScope,
+      labelVisibility,
+      labelFontSizes,
       labelContentMode,
       context,
       regionScope,

@@ -15,9 +15,9 @@ export function applyRegionFocusColors(
   scope: RegionScope,
   mode: RegionRenderMode,
 ): DistrictColorMap {
-  if (!isRegionFocused(scope) || mode === 'export-focused') {
-    if (mode !== 'export-focused') return colors
+  if (!isRegionFocused(scope)) return colors
 
+  if (mode === 'interactive' || mode === 'export-focused') {
     const filtered: DistrictColorMap = {}
     for (const [districtId, style] of Object.entries(colors)) {
       if (isDistrictInScope(scope, districtId)) {

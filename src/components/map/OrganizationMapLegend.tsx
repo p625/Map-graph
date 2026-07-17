@@ -1,72 +1,72 @@
+import type { OrganizationLegendItem, OrganizationLegendSettings } from '../../domain/organization/organizationLegend'
 import {
-  formatOrganizationLegendLabel,
-  type OrganizationLegendItem,
-  type OrganizationLegendSettings,
-} from '../../domain/organization/organizationLegend'
+  clampLegendLayoutToBounds,
+  computeAutoColumnCount,
+  distributeItemsRowMajor,
+  resolveOrganizationLegendSegments,
+} from '../../domain/organization/organizationLegendLayout'
 
 interface OrganizationMapLegendProps {
   items: OrganizationLegendItem[]
   settings: OrganizationLegendSettings
-  viewBox: string | null
   mapWidth: number
   mapHeight: number
-}
-
-function parseViewBox(viewBox: string | null, width: number, height: number) {
-  if (!viewBox) return { x: 0, y: 0, w: width, h: height }
-  const parts = viewBox.trim().split(/\s+/).map(Number)
-  return {
-    x: parts[0] ?? 0,
-    y: parts[1] ?? 0,
-    w: parts[2] ?? width,
-    h: parts[3] ?? height,
-  }
 }
 
 export function OrganizationMapLegend({
   items,
   settings,
-  viewBox,
   mapWidth,
   mapHeight,
 }: OrganizationMapLegendProps) {
   if (!settings.enabled || items.length === 0) return null
 
-  const box = parseViewBox(viewBox, mapWidth, mapHeight)
-  const fontSize = Math.max(8, Math.min(12, Math.round(box.w * 0.012)))
+  const layout = clampLegendLayoutToBounds(settings.layout, mapWidth, mapHeight)
+  const columnCount = computeAutoColumnCount(layout, items, settings.labelMode, settings.showWorkplaceCount)
+  const orderedItems = distributeItemsRowMajor(items, columnCount)
+  const left = (layout.xPercent / 100) * mapWidth
+  const top = (layout.yPercent / 100) * mapHeight
+  const fontSize = layout.fontSizePx
   const swatch = Math.max(8, fontSize)
-  const padding = Math.max(6, Math.round(fontSize * 0.7))
-  const lineHeight = fontSize * 1.35
-  const textOffset = swatch + 6
-
-  const labels = items.map((item) =>
-    formatOrganizationLegendLabel(item, settings.labelMode, settings.showWorkplaceCount),
-  )
-  const maxTextWidth = labels.reduce((max, label) => Math.max(max, label.length * fontSize * 0.52), 0)
-  const legendWidth = Math.min(box.w * 0.38, Math.max(swatch + 8, textOffset + maxTextWidth + padding * 2))
-  const legendHeight = padding * 2 + items.length * lineHeight
-  const originX = box.x + box.w - legendWidth - padding
-  const originY = box.y + padding
+  const rowHeight = fontSize * 1.35 + layout.rowGapPx + layout.itemGapPx
+  const colWidth = layout.width / columnCount
+  const background =
+    layout.backgroundMode === 'light' ? 'rgba(255, 255, 255, 0.82)' : 'transparent'
 
   return (
     <g data-layer="organization-legend" pointerEvents="none">
-      <rect
-        x={originX}
-        y={originY}
-        width={legendWidth}
-        height={legendHeight}
-        rx={4}
-        fill="rgba(255, 255, 255, 0.92)"
-        stroke="#e2e8f0"
-        strokeWidth={0.75}
-      />
-      {items.map((item, index) => {
-        const y = originY + padding + index * lineHeight + fontSize * 0.85
-        const label = labels[index] ?? ''
+      {background !== 'transparent' && (
+        <rect
+          x={left}
+          y={top}
+          width={layout.width}
+          height={layout.height}
+          fill={background}
+          rx={2}
+        />
+      )}
+      {orderedItems.map((item, index) => {
+        const col = index % columnCount
+        const row = Math.floor(index / columnCount)
+        const x = left + col * colWidth + 6
+        const y = top + row * rowHeight + fontSize + 4
+        const segment = resolveOrganizationLegendSegments(
+          item,
+          settings.labelMode,
+          settings.showWorkplaceCount,
+        )
+        const swatchX = x
+        const textStartX = x + swatch + 6
+        const designationWidth =
+          segment.showDesignation && segment.designation
+            ? segment.designation.length * fontSize * 0.52 + 8
+            : 0
+        const leaderX = textStartX + designationWidth
+
         return (
           <g key={item.leaderId}>
             <rect
-              x={originX + padding}
+              x={swatchX}
               y={y - swatch + 2}
               width={swatch}
               height={swatch}
@@ -75,15 +75,38 @@ export function OrganizationMapLegend({
               stroke="#cbd5e1"
               strokeWidth={0.5}
             />
-            {label && (
+            {segment.showDesignation && segment.designation && (
               <text
-                x={originX + padding + textOffset}
+                x={textStartX}
                 y={y}
                 fontSize={fontSize}
+                fontWeight={600}
                 fill="#1e293b"
-                style={{ fontFamily: 'system-ui, sans-serif', fontWeight: 500 }}
+                style={{ fontFamily: 'system-ui, sans-serif' }}
               >
-                {label}
+                {segment.designation}
+              </text>
+            )}
+            {segment.showLeader && segment.leaderName && (
+              <text
+                x={leaderX}
+                y={y}
+                fontSize={fontSize}
+                fill="#334155"
+                style={{ fontFamily: 'system-ui, sans-serif' }}
+              >
+                {segment.leaderName}
+              </text>
+            )}
+            {segment.showCount && (
+              <text
+                x={leaderX + (segment.showLeader ? segment.leaderName.length * fontSize * 0.52 + 4 : 0)}
+                y={y}
+                fontSize={fontSize}
+                fill="#64748b"
+                style={{ fontFamily: 'system-ui, sans-serif' }}
+              >
+                ({segment.workplaceCount})
               </text>
             )}
           </g>

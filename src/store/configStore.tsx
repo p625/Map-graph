@@ -22,6 +22,7 @@ import type { OrganizationSnapshot } from '../domain/organization/types'
 import { isOrganizationSynced } from '../domain/organization/organizationState'
 import { snapshotToConfigAssignments } from '../domain/organization/organizationSync'
 import { buildDefaultDistrictAssignments, loadJson, saveJson } from '../utils/storage'
+import { useNotifications } from './notificationStore'
 
 const CONFIG_STORAGE_KEY = 'map-graph-config-v4'
 const ORG_STORAGE_KEY = 'map-graph-org-v1'
@@ -256,6 +257,26 @@ const ConfigStateContext = createContext<ConfigState | null>(null)
 const HistoryMetaContext = createContext<{ canUndo: boolean; canRedo: boolean } | null>(null)
 const ConfigDispatchContext = createContext<Dispatch<ConfigAction> | null>(null)
 
+function ConfigPersistenceBridge({ state }: { state: ConfigState }) {
+  const { notify } = useNotifications()
+
+  useEffect(() => {
+    const result = saveJson(CONFIG_STORAGE_KEY, state)
+    if (!result.ok) {
+      notify({
+        type: 'error',
+        title: 'Uložení konfigurace selhalo',
+        message:
+          result.error === 'quota'
+            ? 'Barvy a přiřazení se nepodařilo uložit — localStorage je plné.'
+            : 'Konfigurace se nepodařila uložit.',
+      })
+    }
+  }, [state, notify])
+
+  return null
+}
+
 export function ConfigProvider({ children }: { children: ReactNode }) {
   const [history, dispatch] = useReducer(historyReducer, undefined, () => ({
     past: [],
@@ -263,16 +284,15 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     future: [],
   }))
 
-  useEffect(() => {
-    saveJson(CONFIG_STORAGE_KEY, history.present)
-  }, [history.present])
-
   return (
     <ConfigStateContext.Provider value={history.present}>
       <HistoryMetaContext.Provider
         value={{ canUndo: history.past.length > 0, canRedo: history.future.length > 0 }}
       >
-        <ConfigDispatchContext.Provider value={dispatch}>{children}</ConfigDispatchContext.Provider>
+        <ConfigDispatchContext.Provider value={dispatch}>
+          <ConfigPersistenceBridge state={history.present} />
+          {children}
+        </ConfigDispatchContext.Provider>
       </HistoryMetaContext.Provider>
     </ConfigStateContext.Provider>
   )

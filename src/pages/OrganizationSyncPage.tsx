@@ -11,7 +11,9 @@ import {
 import { parseTableFile } from '../domain/import/fileParser'
 import { useConfigDispatch } from '../store/configStore'
 import {
+  isOrganizationSynced,
   useOrganizationDispatch,
+  useOrganizationHydrationStatus,
   useOrganizationState,
 } from '../store/organizationStore'
 import { useNotifications } from '../store/notificationStore'
@@ -101,6 +103,7 @@ function ChangeSection({
 
 export function OrganizationSyncPage() {
   const { snapshot } = useOrganizationState()
+  const hydrationStatus = useOrganizationHydrationStatus()
   const orgDispatch = useOrganizationDispatch()
   const configDispatch = useConfigDispatch()
   const { notify } = useNotifications()
@@ -213,6 +216,36 @@ export function OrganizationSyncPage() {
           Soubor je synchronizační zdroj — interní entity se kvůli aliasům nepřejmenovávají.
         </p>
       </div>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm">
+        <div className="flex flex-wrap items-center gap-4">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-medium ${
+              isOrganizationSynced(snapshot)
+                ? 'bg-green-100 text-green-800'
+                : 'bg-amber-100 text-amber-800'
+            }`}
+          >
+            {isOrganizationSynced(snapshot) ? 'Organizace synchronizována' : 'Organizace nesynchronizována'}
+          </span>
+          {snapshot.syncedAt && (
+            <span className="text-slate-600">
+              Poslední sync: {new Date(snapshot.syncedAt).toLocaleString('cs-CZ')}
+            </span>
+          )}
+          {snapshot.sourceFileName && (
+            <span className="text-slate-600">Soubor: {snapshot.sourceFileName}</span>
+          )}
+          <span className="text-slate-600">
+            {snapshot.workplaces.filter((wp) => !wp.absentFromSync).length} pracovišť ·{' '}
+            {snapshot.leaders.length} vedoucích · {snapshot.regions.length} regionů
+          </span>
+          <span className="text-slate-500">Hydration: {hydrationStatus}</span>
+        </div>
+        <p className="mt-2 text-xs text-slate-500">
+          Po úspěšné synchronizaci se organizace automaticky ukládá a obnoví při příštím spuštění.
+        </p>
+      </section>
 
       <ol className="flex flex-wrap gap-2">
         {steps.map((item, index) => (

@@ -13,6 +13,7 @@ const links = [
   { to: '/config/regional', label: 'Pracoviště → Regiony' },
   { to: '/config/leaders', label: 'Pracoviště → Vedoucí' },
   { to: '/organization/sync', label: 'Synchronizace organizace' },
+  { to: '/settings/workspace', label: 'Záloha a data' },
 ]
 
 export function Sidebar() {

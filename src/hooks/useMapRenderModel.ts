@@ -13,7 +13,8 @@ import { getRegionViewport } from '../domain/region/regionViewport'
 import { isRegionFocused } from '../domain/region/regionScope'
 import type { RegionScope, SvgViewport } from '../domain/region/types'
 import { buildMapLabels } from '../domain/labels/labelEngine'
-import type { LabelContentMode, LabelScope, LabelSizePreset } from '../domain/labels/labelEngine'
+import type { LabelContentMode, LabelSizePreset } from '../domain/labels/labelEngine'
+import type { MapLabelFontSizes, MapLabelVisibility } from '../domain/labels/labelSettings'
 import { buildTerritoryLayers } from '../domain/territory/territoryEngine'
 import {
   createWorkplaceResolver,
@@ -23,6 +24,8 @@ import type { BoundaryVisibility, TerritoryLayers } from '../domain/territory/ty
 import type { DistrictColorMap, VisualizationContext } from '../domain/visualization/types'
 import { useConfigData, useConfigState } from '../store/configStore'
 import { useMapState } from '../store/mapStore'
+import { useWorkplaceLabelOverrides } from '../store/workplaceLabelOverridesStore'
+import { useRegionLabelOverrides } from '../store/regionLabelOverridesStore'
 import { visualizationRegistry } from '../domain/visualization/VisualizationRegistry'
 
 export interface UseMapRenderModelInput {
@@ -32,12 +35,17 @@ export interface UseMapRenderModelInput {
   strokeColor?: string
   boundaryVisibility: BoundaryVisibility
   showLabels: boolean
-  labelScope: LabelScope
+  labelVisibility?: MapLabelVisibility
+  labelFontSizes?: MapLabelFontSizes
   labelContentMode?: LabelContentMode
   labelSizePreset?: LabelSizePreset
   labelFontSizePx?: number
+  labelHaloSettings?: import('../domain/labels/labelHaloSettings').MapLabelHaloSettings
+  /** @deprecated použij labelHaloSettings */
   labelHaloEnabled?: boolean
   labelHideOnCollision?: boolean
+  workplaceLabelOverrides?: import('../domain/labels/workplaceLabelOverrides').WorkplaceLabelOverrideMap
+  regionLabelOverrides?: import('../domain/labels/regionLabelOverrides').RegionLabelOverrideMap
   context?: VisualizationContext
   separateDistrictStrokes?: boolean
   regionScope?: RegionScope
@@ -50,9 +58,8 @@ function filterTerritoryLayers(
   scope: RegionScope,
   mode: RegionRenderMode,
 ): TerritoryLayers {
-  if (mode !== 'export-focused' || !isRegionFocused(scope)) {
-    return territories
-  }
+  if (!isRegionFocused(scope)) return territories
+  if (mode !== 'interactive' && mode !== 'export-focused') return territories
 
   const fillPolygons = filterTerritoryLayersForExport(territories.fillPolygons, scope)
 
@@ -72,7 +79,18 @@ function filterTerritoryLayers(
 
 export function useMapRenderModel(input: UseMapRenderModelInput) {
   const config = useConfigState()
-  const { pluginId, labelSizePreset, labelFontSizePx, labelHaloEnabled, labelHideOnCollision } = useMapState()
+  const {
+    pluginId,
+    labelVisibility,
+    labelFontSizes,
+    labelSizePreset,
+    labelFontSizePx,
+    labelHaloSettings,
+    labelHaloEnabled,
+    labelHideOnCollision,
+  } = useMapState()
+  const { overrides: workplaceLabelOverrides } = useWorkplaceLabelOverrides()
+  const { overrides: regionLabelOverrides } = useRegionLabelOverrides()
   const { districts, workplaces, regionalOffices } = useConfigData()
   const plugin = visualizationRegistry.getById(pluginId)
   const separateDistrictStrokes =
@@ -174,7 +192,8 @@ export function useMapRenderModel(input: UseMapRenderModelInput) {
     const built = buildMapLabels({
       resolver,
       territories,
-      scope: input.labelScope,
+      labelVisibility: input.labelVisibility ?? labelVisibility,
+      labelFontSizes: input.labelFontSizes ?? labelFontSizes,
       width: input.width,
       height: input.height,
       assignmentHash,
@@ -182,8 +201,11 @@ export function useMapRenderModel(input: UseMapRenderModelInput) {
       context: input.context,
       labelSizePreset: input.labelSizePreset ?? labelSizePreset,
       labelFontSizePx: input.labelFontSizePx ?? labelFontSizePx,
+      labelHaloSettings: input.labelHaloSettings ?? labelHaloSettings,
       labelHaloEnabled: input.labelHaloEnabled ?? labelHaloEnabled,
       labelHideOnCollision: input.labelHideOnCollision ?? labelHideOnCollision,
+      workplaceLabelOverrides: input.workplaceLabelOverrides ?? workplaceLabelOverrides,
+      regionLabelOverrides: input.regionLabelOverrides ?? regionLabelOverrides,
     })
     if (!regionScope) return built
     return filterLabelsForRegion(built, regionScope)
@@ -191,21 +213,30 @@ export function useMapRenderModel(input: UseMapRenderModelInput) {
     resolver,
     territories,
     input.showLabels,
-    input.labelScope,
+    input.labelVisibility,
+    input.labelFontSizes,
     input.labelContentMode,
     input.labelSizePreset,
     input.labelFontSizePx,
+    input.labelHaloSettings,
     input.labelHaloEnabled,
     input.labelHideOnCollision,
+    input.workplaceLabelOverrides,
+    input.regionLabelOverrides,
     input.context,
     input.width,
     input.height,
     assignmentHash,
     regionScope,
+    labelVisibility,
+    labelFontSizes,
     labelSizePreset,
     labelFontSizePx,
+    labelHaloSettings,
     labelHaloEnabled,
     labelHideOnCollision,
+    workplaceLabelOverrides,
+    regionLabelOverrides,
   ])
 
   const viewport: SvgViewport | null = useMemo(() => {

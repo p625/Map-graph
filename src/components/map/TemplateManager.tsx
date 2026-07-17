@@ -2,8 +2,12 @@ import { useMemo, useState } from 'react'
 import type { MapTemplate } from '../../domain/export/mapTemplates'
 import {
   applyMapTemplate,
+  domainFontSizesToTemplate,
+  domainVisibilityToTemplate,
   loadMapTemplates,
   saveMapTemplates,
+  templateFontSizesToDomain,
+  templateVisibilityToDomain,
 } from '../../domain/export/mapTemplates'
 import type { MapExportSettings, MapTemplateApplyPayload } from './export/MapExportPanel'
 import { useMapState } from '../../store/mapStore'
@@ -31,7 +35,8 @@ function templateToPayload(
       showOrganizationLegend: false,
       showDatasetInfo: resolved.showDatasetInfo,
       showLabels: resolved.showLabels,
-      labelScope: resolved.labelScope,
+      labelVisibility: templateVisibilityToDomain(resolved.labelVisibility, resolved.labelScope),
+      labelFontSizes: templateFontSizesToDomain(resolved.labelFontSizes),
       labelContentMode: resolved.labelContentMode,
       boundaryVisibility: resolved.boundaryVisibility,
       presetId: resolved.presetId,
@@ -68,7 +73,8 @@ function settingsToTemplate(
     showLegend: settings.showLegend,
     showDatasetInfo: settings.showDatasetInfo,
     showLabels: settings.showLabels,
-    labelScope: settings.labelScope,
+    labelVisibility: domainVisibilityToTemplate(settings.labelVisibility),
+    labelFontSizes: domainFontSizesToTemplate(settings.labelFontSizes),
     labelContentMode: settings.labelContentMode,
     boundaryVisibility: settings.boundaryVisibility,
     pluginId: visualization.pluginId,

@@ -3,6 +3,7 @@ import type { DatasetColumn } from '../types/datasetColumn'
 import type { DatasetRecord } from '../types/datasetRecord'
 import type { Workplace } from '../types/workplace'
 import { resolveStatusFromPreview } from '../dataset/datasetValidation'
+import { createImportSnapshot } from '../dataset/datasetSnapshot'
 import {
   detectColumnTypes,
   toColumnKey,
@@ -94,12 +95,16 @@ export function createDatasetFromPreview(
     sourceFileName?: string
   },
 ): Dataset {
+  const importedAt = new Date().toISOString()
   return {
     id: params.id,
     name: params.name,
     source: params.source,
     sourceFileName: params.sourceFileName,
-    importedAt: new Date().toISOString(),
+    importedAt,
+    updatedAt: importedAt,
+    revision: 1,
+    importSnapshot: createImportSnapshot(params.name, preview.columns, preview.records),
     status: resolveStatusFromPreview(preview),
     columns: preview.columns,
     recordCount: preview.records.length,

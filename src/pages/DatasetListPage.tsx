@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { datasetStatusLabel } from '../domain/dataset/datasetValidation'
-import { useDatasetDispatch, useDatasetState } from '../store/datasetStore'
+import { useDatasetActions, useDatasetDispatch, useDatasetState } from '../store/datasetStore'
 import { useNotifications } from '../store/notificationStore'
 
 const statusColors: Record<string, string> = {
@@ -14,6 +14,7 @@ const statusColors: Record<string, string> = {
 export function DatasetListPage() {
   const { datasets } = useDatasetState()
   const dispatch = useDatasetDispatch()
+  const { duplicateDataset } = useDatasetActions()
   const { notify } = useNotifications()
 
   function handleRemove(id: string, name: string) {
@@ -26,13 +27,32 @@ export function DatasetListPage() {
     })
   }
 
+  function handleDuplicate(id: string, name: string) {
+    duplicateDataset(id)
+    notify({
+      type: 'success',
+      title: 'Dataset duplikován',
+      message: `Vytvořena kopie datasetu „${name}".`,
+    })
+  }
+
+  function handleRestore(id: string, name: string) {
+    if (!confirm(`Obnovit původní import datasetu „${name}"? Ruční úpravy budou ztraceny.`)) return
+    dispatch({ type: 'restore-dataset-import', datasetId: id })
+    notify({
+      type: 'info',
+      title: 'Import obnoven',
+      message: `Dataset „${name}" byl vrácen do původního stavu.`,
+    })
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900">Datasety</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Přehled importovaných datasetů a jejich stavu připravenosti.
+            Přehled importovaných datasetů. Data lze upravit přímo v aplikaci bez nového importu.
           </p>
         </div>
         <Link
@@ -62,8 +82,9 @@ export function DatasetListPage() {
                 <th className="px-4 py-3 font-medium text-slate-700">Stav</th>
                 <th className="px-4 py-3 font-medium text-slate-700">Řádky</th>
                 <th className="px-4 py-3 font-medium text-slate-700">Párování</th>
-                <th className="px-4 py-3 font-medium text-slate-700">Zdroj</th>
                 <th className="px-4 py-3 font-medium text-slate-700">Import</th>
+                <th className="px-4 py-3 font-medium text-slate-700">Poslední změna</th>
+                <th className="px-4 py-3 font-medium text-slate-700">Revize</th>
                 <th className="px-4 py-3 font-medium text-slate-700" />
               </tr>
             </thead>
@@ -82,18 +103,45 @@ export function DatasetListPage() {
                   <td className="px-4 py-3 text-slate-700">
                     {dataset.matchedCount}/{dataset.recordCount}
                   </td>
-                  <td className="px-4 py-3 text-slate-700">{dataset.source}</td>
                   <td className="px-4 py-3 text-slate-500">
                     {new Date(dataset.importedAt).toLocaleDateString('cs-CZ')}
                   </td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {new Date(dataset.updatedAt ?? dataset.importedAt).toLocaleDateString('cs-CZ')}
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">{dataset.revision ?? 1}</td>
                   <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      className="text-sm text-red-600 hover:underline"
-                      onClick={() => handleRemove(dataset.id, dataset.name)}
-                    >
-                      Smazat
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        to={`/datasets/${dataset.id}/edit`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        Upravit data
+                      </Link>
+                      <button
+                        type="button"
+                        className="text-slate-600 hover:underline"
+                        onClick={() => handleDuplicate(dataset.id, dataset.name)}
+                      >
+                        Duplikovat
+                      </button>
+                      {dataset.importSnapshot && (
+                        <button
+                          type="button"
+                          className="text-amber-700 hover:underline"
+                          onClick={() => handleRestore(dataset.id, dataset.name)}
+                        >
+                          Obnovit import
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="text-red-600 hover:underline"
+                        onClick={() => handleRemove(dataset.id, dataset.name)}
+                      >
+                        Smazat
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

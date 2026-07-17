@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   type Dispatch,
   type ReactNode,
@@ -23,9 +24,12 @@ import {
 } from '../domain/organization/assignmentValidation'
 import type { OrganizationSnapshot } from '../domain/organization/types'
 import { loadJson, saveJson } from '../utils/storage'
+import { useNotifications } from './notificationStore'
 
 const ORG_STORAGE_KEY = 'map-graph-org-v1'
 const MAX_HISTORY = 50
+
+export type OrganizationHydrationStatus = 'loading' | 'ready' | 'missing' | 'invalid'
 
 interface HistoryState {
   past: OrganizationSnapshot[]
@@ -47,6 +51,7 @@ type OrganizationAction =
   | { type: 'undo' }
   | { type: 'redo' }
   | { type: 'reset' }
+  | { type: 'clear-persisted-organization' }
 
 function cloneSnapshot(snapshot: OrganizationSnapshot): OrganizationSnapshot {
   return {
@@ -68,6 +73,13 @@ function loadInitialSnapshot(): OrganizationSnapshot {
     return seedOrganizationFromWorkplaces()
   }
   return normalizePersistedOrganization(stored)
+}
+
+function resolveHydrationStatus(snapshot: OrganizationSnapshot): OrganizationHydrationStatus {
+  const stored = loadJson<OrganizationSnapshot | null>(ORG_STORAGE_KEY, null)
+  if (!stored || isEmptyOrganizationSeed(stored)) return 'missing'
+  if (!isOrganizationSynced(snapshot)) return 'invalid'
+  return 'ready'
 }
 
 function applyOrganizationAction(
@@ -159,6 +171,9 @@ function applyOrganizationAction(
     }
     case 'reset':
       return seedOrganizationFromWorkplaces()
+    case 'clear-persisted-organization':
+      localStorage.removeItem(ORG_STORAGE_KEY)
+      return seedOrganizationFromWorkplaces()
     default:
       return snapshot
   }
@@ -197,7 +212,7 @@ function historyReducer(state: HistoryState, action: OrganizationAction): Histor
   const nextPresent = applyOrganizationAction(state.present, action)
   if (!nextPresent || nextPresent === state.present) return state
 
-  if (action.type === 'set-snapshot' || action.type === 'reset') {
+  if (action.type === 'set-snapshot' || action.type === 'reset' || action.type === 'clear-persisted-organization') {
     return {
       past: [],
       present: nextPresent,
@@ -217,8 +232,30 @@ function historyReducer(state: HistoryState, action: OrganizationAction): Histor
 }
 
 const SnapshotContext = createContext<OrganizationSnapshot | null>(null)
+const HydrationContext = createContext<OrganizationHydrationStatus>('loading')
 const HistoryMetaContext = createContext<{ canUndo: boolean; canRedo: boolean } | null>(null)
 const DispatchContext = createContext<Dispatch<OrganizationAction> | null>(null)
+
+function OrganizationPersistenceBridge({ snapshot }: { snapshot: OrganizationSnapshot }) {
+  const { notify } = useNotifications()
+
+  useEffect(() => {
+    if (isEmptyOrganizationSeed(snapshot)) return
+    const result = saveJson(ORG_STORAGE_KEY, snapshot)
+    if (!result.ok) {
+      notify({
+        type: 'error',
+        title: 'Uložení organizace selhalo',
+        message:
+          result.error === 'quota'
+            ? 'localStorage je plné. Exportujte zálohu a uvolněte místo.'
+            : 'Organizační data se nepodařilo uložit.',
+      })
+    }
+  }, [snapshot, notify])
+
+  return null
+}
 
 export function OrganizationProvider({ children }: { children: ReactNode }) {
   const [history, dispatch] = useReducer(historyReducer, undefined, () => ({
@@ -227,18 +264,23 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
     future: [],
   }))
 
-  useEffect(() => {
-    if (isEmptyOrganizationSeed(history.present)) return
-    saveJson(ORG_STORAGE_KEY, history.present)
-  }, [history.present])
+  const hydrationStatus = useMemo(
+    () => resolveHydrationStatus(history.present),
+    [history.present],
+  )
 
   return (
     <SnapshotContext.Provider value={history.present}>
-      <HistoryMetaContext.Provider
-        value={{ canUndo: history.past.length > 0, canRedo: history.future.length > 0 }}
-      >
-        <DispatchContext.Provider value={dispatch}>{children}</DispatchContext.Provider>
-      </HistoryMetaContext.Provider>
+      <HydrationContext.Provider value={hydrationStatus}>
+        <HistoryMetaContext.Provider
+          value={{ canUndo: history.past.length > 0, canRedo: history.future.length > 0 }}
+        >
+          <DispatchContext.Provider value={dispatch}>
+            <OrganizationPersistenceBridge snapshot={history.present} />
+            {children}
+          </DispatchContext.Provider>
+        </HistoryMetaContext.Provider>
+      </HydrationContext.Provider>
     </SnapshotContext.Provider>
   )
 }
@@ -246,6 +288,12 @@ export function OrganizationProvider({ children }: { children: ReactNode }) {
 export function useOrganizationSnapshot(): OrganizationSnapshot {
   const context = useContext(SnapshotContext)
   if (!context) throw new Error('useOrganizationSnapshot must be used within OrganizationProvider')
+  return context
+}
+
+export function useOrganizationHydrationStatus(): OrganizationHydrationStatus {
+  const context = useContext(HydrationContext)
+  if (!context) throw new Error('useOrganizationHydrationStatus must be used within OrganizationProvider')
   return context
 }
 
@@ -284,6 +332,7 @@ export function useOrganizationActions() {
     undo: () => dispatch({ type: 'undo' }),
     redo: () => dispatch({ type: 'redo' }),
     reset: () => dispatch({ type: 'reset' }),
+    clearPersistedOrganization: () => dispatch({ type: 'clear-persisted-organization' }),
   }
 }
 

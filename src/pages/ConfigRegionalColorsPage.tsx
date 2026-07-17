@@ -64,7 +64,7 @@ export function ConfigRegionalColorsPage() {
           <h2 className="text-2xl font-semibold text-slate-900">Barvy regionů</h2>
           <p className="mt-1 text-sm text-slate-600">
             Barvy se používají pouze v mapovém režimu „Podle regionů“. Ostatní režimy je
-            neovlivní.
+            neovlivní. Změny se ukládají automaticky.
           </p>
         </div>
         <ConfigToolbar />

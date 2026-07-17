@@ -1,4 +1,5 @@
 import type { DatasetColumn } from './datasetColumn'
+import type { DatasetImportSnapshot } from '../dataset/datasetSnapshot'
 
 export type DataSourceType = 'manual' | 'excel' | 'csv' | 'lpis' | 'other'
 
@@ -15,6 +16,9 @@ export interface Dataset {
   source: DataSourceType
   sourceFileName?: string
   importedAt: string
+  updatedAt?: string
+  revision?: number
+  importSnapshot?: DatasetImportSnapshot
   status: DatasetStatus
   columns: DatasetColumn[]
   recordCount: number

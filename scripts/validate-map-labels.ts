@@ -135,11 +135,11 @@ async function main() {
   const labels = buildMapLabels({
     resolver,
     territories,
-    scope: 'workplace',
+    labelVisibility: { showWorkplaceLabels: true, showRegionLabels: false, showDistrictLabels: false },
+    labelFontSizes: { workplaceFontSizePx: 9, regionFontSizePx: 14, districtFontSizePx: 7 },
     width: WIDTH,
     height: HEIGHT,
     assignmentHash,
-    labelFontSizePx: 9,
   })
 
   const visibleWorkplaceLabels = labels.filter(
@@ -202,11 +202,11 @@ async function main() {
     const sized = buildMapLabels({
       resolver,
       territories,
-      scope: 'workplace',
+      labelVisibility: { showWorkplaceLabels: true, showRegionLabels: false, showDistrictLabels: false },
+      labelFontSizes: { workplaceFontSizePx: size, regionFontSizePx: 14, districtFontSizePx: 7 },
       width: WIDTH,
       height: HEIGHT,
       assignmentHash,
-      labelFontSizePx: size,
       disableCollisionAvoidance: true,
     })
     check(
@@ -218,8 +218,8 @@ async function main() {
 
   check(
     'font-size-sanitize-invalid',
-    sanitizeLabelFontSizePx(0) === 9 && sanitizeLabelFontSizePx(99) === 24,
-    '0→9, 99→24',
+    sanitizeLabelFontSizePx(0) === 8 && sanitizeLabelFontSizePx(99) === 24,
+    '0→8, 99→24',
   )
 
   const memory = new Map<string, string>()
@@ -235,11 +235,11 @@ async function main() {
   const exportLabels = buildMapLabels({
     resolver,
     territories,
-    scope: 'workplace',
+    labelVisibility: { showWorkplaceLabels: true, showRegionLabels: false, showDistrictLabels: false },
+    labelFontSizes: { workplaceFontSizePx: 10, regionFontSizePx: 14, districtFontSizePx: 7 },
     width: 1920,
     height: 1080,
     assignmentHash,
-    labelFontSizePx: 10,
     disableCollisionAvoidance: true,
   })
   const exportVisible = exportLabels.filter((label) => label.visible)

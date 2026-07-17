@@ -6,6 +6,8 @@ import { ConfigProvider } from './store/configStore.tsx'
 import { AssignmentConfigBridge } from './components/config/AssignmentConfigBridge.tsx'
 import { DatasetProvider } from './store/datasetStore.tsx'
 import { MapProvider } from './store/mapStore.tsx'
+import { RegionLabelOverridesProvider } from './store/regionLabelOverridesStore.tsx'
+import { WorkplaceLabelOverridesProvider } from './store/workplaceLabelOverridesStore.tsx'
 import { NotificationProvider } from './store/notificationStore.tsx'
 import { OrganizationProvider } from './store/organizationStore.tsx'
 import './index.css'
@@ -19,7 +21,11 @@ createRoot(document.getElementById('root')!).render(
             <AssignmentConfigBridge />
             <DatasetProvider>
               <MapProvider>
-                <App />
+                <RegionLabelOverridesProvider>
+                  <WorkplaceLabelOverridesProvider>
+                    <App />
+                  </WorkplaceLabelOverridesProvider>
+                </RegionLabelOverridesProvider>
               </MapProvider>
             </DatasetProvider>
           </ConfigProvider>

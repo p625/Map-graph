@@ -2,7 +2,8 @@ import { useMemo, useRef, useState } from 'react'
 import type { ExportPresetId, ExportQuality } from '../../../domain/export/exportPresets'
 import { exportMapImage, getExportErrorMessage } from '../../../domain/export/exportMapImage'
 import { generateExportFilename } from '../../../domain/export/filenameGenerator'
-import type { LabelContentMode, LabelScope } from '../../../domain/labels/labelEngine'
+import type { LabelContentMode } from '../../../domain/labels/labelEngine'
+import type { MapLabelFontSizes, MapLabelVisibility } from '../../../domain/labels/labelSettings'
 import type { BoundaryVisibility } from '../../../domain/territory/types'
 import type { ExportMapSizing, MapSizeMode } from '../../../domain/export/exportMapLayout'
 import { BALANCED_EXPORT_MAP_SIZING, DEFAULT_EXPORT_MAP_SIZING } from '../../../domain/export/exportMapLayout'
@@ -31,7 +32,8 @@ export interface MapExportSettings {
   showOrganizationLegend: boolean
   showDatasetInfo: boolean
   showLabels: boolean
-  labelScope: LabelScope
+  labelVisibility: MapLabelVisibility
+  labelFontSizes: MapLabelFontSizes
   labelContentMode: LabelContentMode
   boundaryVisibility: BoundaryVisibility
   presetId: ExportPresetId
@@ -82,7 +84,8 @@ export function MapExportPanel({
   const { notify } = useNotifications()
   const {
     showLabels: mapShowLabels,
-    labelScope: mapLabelScope,
+    labelVisibility: mapLabelVisibility,
+    labelFontSizes: mapLabelFontSizes,
     labelContentMode: mapLabelContentMode,
     boundaryVisibility: mapBoundaries,
     pluginId: mapPluginId,
@@ -97,7 +100,8 @@ export function MapExportPanel({
     setColumn,
     setBoundaryVisibility,
     setShowLabels,
-    setLabelScope,
+    updateLabelVisibility,
+    updateLabelFontSizes,
     setLabelContentMode,
     setFocusedRegion,
     clearFocusedRegion,
@@ -115,7 +119,8 @@ export function MapExportPanel({
     showOrganizationLegend: organizationLegend.enabled,
     showDatasetInfo: true,
     showLabels: mapShowLabels,
-    labelScope: mapLabelScope,
+    labelVisibility: mapLabelVisibility,
+    labelFontSizes: mapLabelFontSizes,
     labelContentMode: mapLabelContentMode,
     boundaryVisibility: mapBoundaries,
     presetId: 'presentation-16-9',
@@ -203,7 +208,8 @@ export function MapExportPanel({
     if (payload.columnKey !== undefined) setColumn(payload.columnKey)
     setBoundaryVisibility(payload.settings.boundaryVisibility)
     setShowLabels(payload.settings.showLabels)
-    setLabelScope(payload.settings.labelScope)
+    updateLabelVisibility(payload.settings.labelVisibility)
+    updateLabelFontSizes(payload.settings.labelFontSizes)
     setLabelContentMode(payload.settings.labelContentMode)
 
     if (payload.regionFocusEnabled === false) {
@@ -247,7 +253,8 @@ export function MapExportPanel({
     showOrganizationLegend: settings.showOrganizationLegend,
     showDatasetInfo: settings.showDatasetInfo,
     showLabels: settings.showLabels,
-    labelScope: settings.labelScope,
+    labelVisibility: settings.labelVisibility,
+    labelFontSizes: settings.labelFontSizes,
     labelContentMode: settings.labelContentMode,
     boundaryVisibility: settings.boundaryVisibility,
     context,
@@ -470,24 +477,53 @@ export function MapExportPanel({
 
           <div className="space-y-2 text-sm">
             <span className="font-medium text-slate-700">Popisky</span>
-            <select
-              className="w-full rounded-md border border-slate-300 px-3 py-2"
-              value={settings.labelScope}
-              disabled={!settings.showLabels}
-              onChange={(e) =>
-                setSettings((s) => ({ ...s, labelScope: e.target.value as LabelScope }))
-              }
-            >
-              <option value="none">Bez popisků</option>
-              <option value="workplace">Pracoviště</option>
-              <option value="region">Regiony</option>
-              <option value="district">Okresy</option>
-            </select>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.labelVisibility.showWorkplaceLabels}
+                disabled={!settings.showLabels}
+                onChange={(e) =>
+                  setSettings((s) => ({
+                    ...s,
+                    labelVisibility: { ...s.labelVisibility, showWorkplaceLabels: e.target.checked },
+                  }))
+                }
+              />
+              <span>Pracoviště</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.labelVisibility.showRegionLabels}
+                disabled={!settings.showLabels}
+                onChange={(e) =>
+                  setSettings((s) => ({
+                    ...s,
+                    labelVisibility: { ...s.labelVisibility, showRegionLabels: e.target.checked },
+                  }))
+                }
+              />
+              <span>Regiony</span>
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={settings.labelVisibility.showDistrictLabels}
+                disabled={!settings.showLabels}
+                onChange={(e) =>
+                  setSettings((s) => ({
+                    ...s,
+                    labelVisibility: { ...s.labelVisibility, showDistrictLabels: e.target.checked },
+                  }))
+                }
+              />
+              <span>Okresy</span>
+            </label>
             {column && (
               <select
                 className="w-full rounded-md border border-slate-300 px-3 py-2"
                 value={settings.labelContentMode}
-                disabled={!settings.showLabels || settings.labelScope === 'none' || settings.labelScope === 'region'}
+                disabled={!settings.showLabels || !settings.labelVisibility.showWorkplaceLabels}
                 onChange={(e) =>
                   setSettings((s) => ({
                     ...s,

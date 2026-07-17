@@ -21,6 +21,14 @@
     "validate-organization-persistence": "tsx scripts/validate-organization-persistence.ts",
     "validate-phase-5c-display-export-persistence": "tsx scripts/validate-phase-5c-display-export-persistence.ts",
     "validate-map-labels": "tsx scripts/validate-map-labels.ts",
+    "validate-map-multilayer-labels": "tsx scripts/validate-map-multilayer-labels.ts",
+    "validate-region-label-halo-legend-resize-focus": "tsx scripts/validate-region-label-halo-legend-resize-focus.ts",
+    "validate-hover-and-label-overrides": "tsx scripts/validate-hover-and-label-overrides.ts",
+    "validate-map-editor": "tsx scripts/validate-map-editor.ts",
+    "validate-dataset-editor": "tsx scripts/validate-dataset-editor.ts",
+    "validate-persistent-workspace": "tsx scripts/validate-persistent-workspace.ts",
+    "validate-label-position-persistence": "tsx scripts/validate-label-position-persistence.ts",
+    "validate-organization-legend-layout": "tsx scripts/validate-region-label-halo-legend-resize-focus.ts",
     "validate-phase-5c-region-colors-org-legend-export-presets": "tsx scripts/validate-phase-5c-region-colors-org-legend-export-presets.ts"
   },
   "dependencies": {

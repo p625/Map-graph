@@ -7,10 +7,17 @@ import {
   type Dispatch,
   type ReactNode,
 } from 'react'
+import {
+  cloneDatasetColumns,
+  cloneDatasetRecords,
+  createImportSnapshot,
+} from '../domain/dataset/datasetSnapshot'
 import { migrateDatasetStatus, resolveReadyStatus } from '../domain/dataset/datasetValidation'
 import type { Dataset, DatasetStatus } from '../domain/types/dataset'
+import type { DatasetColumn } from '../domain/types/datasetColumn'
 import type { DatasetRecord } from '../domain/types/datasetRecord'
 import {
+  createId,
   estimateJsonBytes,
   isDatasetStateValid,
   loadJson,
@@ -27,20 +34,47 @@ interface DatasetState {
   recordsByDataset: Record<string, DatasetRecord[]>
 }
 
+export interface SaveDatasetEditsPayload {
+  datasetId: string
+  name: string
+  columns: DatasetColumn[]
+  records: DatasetRecord[]
+}
+
 type DatasetAction =
   | { type: 'add-dataset'; dataset: Dataset; records: DatasetRecord[] }
   | { type: 'update-record-match'; datasetId: string; recordId: string; workplaceId: string }
   | { type: 'update-dataset-status'; datasetId: string; status: DatasetStatus }
+  | { type: 'save-dataset-edits'; payload: SaveDatasetEditsPayload }
+  | { type: 'restore-dataset-import'; datasetId: string }
+  | { type: 'duplicate-dataset'; datasetId: string }
   | { type: 'remove-dataset'; datasetId: string }
 
-function migrateState(stored: DatasetState): DatasetState {
+function migrateDataset(dataset: Dataset, records: DatasetRecord[]): Dataset {
+  const importedAt = dataset.importedAt ?? new Date().toISOString()
+  const updatedAt = dataset.updatedAt ?? importedAt
+  const revision = typeof dataset.revision === 'number' ? dataset.revision : 1
+  const importSnapshot =
+    dataset.importSnapshot ??
+    createImportSnapshot(dataset.name, dataset.columns, cloneDatasetRecords(records))
+
   return {
-    ...stored,
-    datasets: stored.datasets.map((dataset) => ({
-      ...dataset,
-      status: migrateDatasetStatus(dataset.status),
-    })),
+    ...dataset,
+    importedAt,
+    updatedAt,
+    revision,
+    importSnapshot,
+    status: migrateDatasetStatus(dataset.status),
   }
+}
+
+function migrateState(stored: DatasetState): DatasetState {
+  const recordsByDataset = { ...stored.recordsByDataset }
+  const datasets = stored.datasets.map((dataset) => {
+    const records = recordsByDataset[dataset.id] ?? []
+    return migrateDataset(dataset, records)
+  })
+  return { datasets, recordsByDataset }
 }
 
 function loadInitialDatasetState(): DatasetState {
@@ -71,16 +105,37 @@ function computeDatasetStatus(
   return resolveReadyStatus(matchedCount, records.length, dataset.columns.length)
 }
 
+function recomputeDataset(
+  dataset: Dataset,
+  records: DatasetRecord[],
+  patch: Partial<Dataset> = {},
+): Dataset {
+  const matchedCount = records.filter((record) => record.workplaceId).length
+  const next = {
+    ...dataset,
+    ...patch,
+    recordCount: records.length,
+    matchedCount,
+    unmatchedCount: records.length - matchedCount,
+  }
+  return {
+    ...next,
+    status: computeDatasetStatus(next, records),
+  }
+}
+
 function datasetReducer(state: DatasetState, action: DatasetAction): DatasetState {
   switch (action.type) {
-    case 'add-dataset':
+    case 'add-dataset': {
+      const dataset = migrateDataset(action.dataset, action.records)
       return {
-        datasets: [action.dataset, ...state.datasets.filter((item) => item.id !== action.dataset.id)],
+        datasets: [dataset, ...state.datasets.filter((item) => item.id !== dataset.id)],
         recordsByDataset: {
           ...state.recordsByDataset,
-          [action.dataset.id]: action.records,
+          [dataset.id]: cloneDatasetRecords(action.records),
         },
       }
+    }
     case 'update-record-match': {
       const records = state.recordsByDataset[action.datasetId] ?? []
       const updatedRecords = records.map((record) =>
@@ -88,18 +143,11 @@ function datasetReducer(state: DatasetState, action: DatasetAction): DatasetStat
           ? { ...record, workplaceId: action.workplaceId, matchStatus: 'manual' as const }
           : record,
       )
-      const matchedCount = updatedRecords.filter((record) => record.workplaceId).length
       const datasets = state.datasets.map((dataset) => {
         if (dataset.id !== action.datasetId) return dataset
-        const next = {
-          ...dataset,
-          matchedCount,
-          unmatchedCount: updatedRecords.length - matchedCount,
-        }
-        return {
-          ...next,
-          status: computeDatasetStatus(next, updatedRecords),
-        }
+        return recomputeDataset(dataset, updatedRecords, {
+          updatedAt: new Date().toISOString(),
+        })
       })
       return {
         datasets,
@@ -116,6 +164,101 @@ function datasetReducer(state: DatasetState, action: DatasetAction): DatasetStat
           dataset.id === action.datasetId ? { ...dataset, status: action.status } : dataset,
         ),
       }
+    case 'save-dataset-edits': {
+      const { datasetId, name, columns, records } = action.payload
+      const existing = state.datasets.find((item) => item.id === datasetId)
+      if (!existing) return state
+
+      const normalizedRecords = cloneDatasetRecords(records).map((record) => ({
+        ...record,
+        datasetId,
+        matchStatus: record.workplaceId ? ('manual' as const) : ('unmatched' as const),
+      }))
+
+      const nextDataset = recomputeDataset(
+        {
+          ...existing,
+          name,
+          columns: cloneDatasetColumns(columns),
+          revision: (existing.revision ?? 1) + 1,
+          updatedAt: new Date().toISOString(),
+        },
+        normalizedRecords,
+      )
+
+      return {
+        datasets: state.datasets.map((dataset) =>
+          dataset.id === datasetId ? nextDataset : dataset,
+        ),
+        recordsByDataset: {
+          ...state.recordsByDataset,
+          [datasetId]: normalizedRecords,
+        },
+      }
+    }
+    case 'restore-dataset-import': {
+      const existing = state.datasets.find((item) => item.id === action.datasetId)
+      if (!existing?.importSnapshot) return state
+
+      const snapshot = existing.importSnapshot
+      const restoredRecords = cloneDatasetRecords(snapshot.records).map((record) => ({
+        ...record,
+        datasetId: action.datasetId,
+      }))
+
+      const nextDataset = recomputeDataset(
+        {
+          ...existing,
+          name: snapshot.name,
+          columns: cloneDatasetColumns(snapshot.columns),
+          revision: (existing.revision ?? 1) + 1,
+          updatedAt: new Date().toISOString(),
+        },
+        restoredRecords,
+      )
+
+      return {
+        datasets: state.datasets.map((dataset) =>
+          dataset.id === action.datasetId ? nextDataset : dataset,
+        ),
+        recordsByDataset: {
+          ...state.recordsByDataset,
+          [action.datasetId]: restoredRecords,
+        },
+      }
+    }
+    case 'duplicate-dataset': {
+      const existing = state.datasets.find((item) => item.id === action.datasetId)
+      if (!existing) return state
+      const sourceRecords = state.recordsByDataset[action.datasetId] ?? []
+      const newId = createId('dataset')
+      const duplicatedRecords = cloneDatasetRecords(sourceRecords).map((record, index) => ({
+        ...record,
+        id: `${newId}-record-${index + 1}`,
+        datasetId: newId,
+      }))
+      const now = new Date().toISOString()
+      const duplicate: Dataset = {
+        ...existing,
+        id: newId,
+        name: `${existing.name} (kopie)`,
+        importedAt: now,
+        updatedAt: now,
+        revision: 1,
+        importSnapshot: createImportSnapshot(
+          `${existing.name} (kopie)`,
+          existing.columns,
+          duplicatedRecords,
+        ),
+      }
+      return {
+        datasets: [duplicate, ...state.datasets],
+        recordsByDataset: {
+          ...state.recordsByDataset,
+          [newId]: duplicatedRecords,
+        },
+      }
+    }
     case 'remove-dataset': {
       const recordsByDataset = { ...state.recordsByDataset }
       delete recordsByDataset[action.datasetId]
@@ -190,4 +333,19 @@ export function useActiveDataset(datasetId: string | null) {
   const dataset = datasets.find((item) => item.id === datasetId) ?? null
   const records = dataset ? recordsByDataset[dataset.id] ?? [] : []
   return { dataset, records }
+}
+
+export function useDatasetActions() {
+  const dispatch = useDatasetDispatch()
+  return {
+    addDataset: (dataset: Dataset, records: DatasetRecord[]) =>
+      dispatch({ type: 'add-dataset', dataset, records }),
+    saveDatasetEdits: (payload: SaveDatasetEditsPayload) =>
+      dispatch({ type: 'save-dataset-edits', payload }),
+    restoreDatasetImport: (datasetId: string) =>
+      dispatch({ type: 'restore-dataset-import', datasetId }),
+    duplicateDataset: (datasetId: string) =>
+      dispatch({ type: 'duplicate-dataset', datasetId }),
+    removeDataset: (datasetId: string) => dispatch({ type: 'remove-dataset', datasetId }),
+  }
 }

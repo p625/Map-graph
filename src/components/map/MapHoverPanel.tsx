@@ -43,7 +43,7 @@ export function MapHoverPanel({
 
   if (!hoveredPolygon) {
     return (
-      <div className="rounded-xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">
+      <div className="min-h-[220px] rounded-xl border border-dashed border-slate-200 bg-white p-4 text-sm text-slate-500">
         Najetím na oblast zobrazíte detail okresu, pracoviště a dat.
       </div>
     )
@@ -77,7 +77,7 @@ export function MapHoverPanel({
   const showDistrictFirst = districtInteraction || plugin.districtInteraction
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="min-h-[220px] rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <h3 className="text-sm font-semibold text-slate-900">
         {showDistrictFirst
           ? (districtNames[0] ?? 'Neznámý okres')
