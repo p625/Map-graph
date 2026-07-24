@@ -1,4 +1,6 @@
 import type { ExportMapScope } from '../region/types'
+import type { ExportCompositionLayout } from './exportCompositionLayout'
+import { sanitizeExportCompositionLayout } from './exportCompositionLayout'
 import type { MapSizeMode } from './exportMapLayout'
 import type { ExportQuality } from './exportPresets'
 import { loadJson, saveJson } from '../../utils/storage'
@@ -16,6 +18,7 @@ export interface CustomExportPreset {
   showLegend: boolean
   showOrganizationLegend: boolean
   showDatasetInfo: boolean
+  exportCompositionLayout?: ExportCompositionLayout
   exportScope: ExportMapScope
   quality: ExportQuality
   createdAt: string
@@ -67,6 +70,9 @@ export function sanitizeCustomExportPreset(raw: unknown): CustomExportPreset | n
     showLegend: item.showLegend !== false,
     showOrganizationLegend: Boolean(item.showOrganizationLegend),
     showDatasetInfo: item.showDatasetInfo !== false,
+    exportCompositionLayout: item.exportCompositionLayout
+      ? sanitizeExportCompositionLayout(item.exportCompositionLayout)
+      : undefined,
     exportScope: item.exportScope === 'focused-region' ? 'focused-region' : 'country',
     quality: item.quality === 'high' ? 'high' : 'standard',
     createdAt: String(item.createdAt ?? now),

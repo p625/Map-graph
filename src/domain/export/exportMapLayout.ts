@@ -62,17 +62,15 @@ export function computeExportLayout(input: ExportLayoutInput): ExportLayoutMetri
     const padding = Math.max(6, Math.round(input.width * 0.008))
     const headerHeight = hasHeader ? Math.round(input.height * 0.06) : 0
     const footerHeight = 0
-    const legendWidth = input.showLegend ? Math.round(input.width * 0.14) : 0
-    const gap = input.showLegend ? Math.round(padding * 0.6) : 0
     const contentHeight = input.height - headerHeight - padding * (hasHeader ? 1.5 : 2)
-    const mapWidth = input.width - padding * 2 - legendWidth - gap
+    const mapWidth = input.width - padding * 2
     const mapHeight = contentHeight
 
     return buildLayoutMetrics(input, {
       padding,
       headerHeight,
       footerHeight,
-      legendWidth,
+      legendWidth: 0,
       mapWidth: Math.max(0, mapWidth),
       mapHeight: Math.max(0, mapHeight),
     })
@@ -82,17 +80,15 @@ export function computeExportLayout(input: ExportLayoutInput): ExportLayoutMetri
     const padding = Math.round(input.width * 0.015)
     const headerHeight = hasHeader ? Math.round(input.height * 0.06) : 0
     const footerHeight = input.showDatasetInfo ? Math.round(input.height * 0.015) : 0
-    const legendWidth = input.showLegend ? Math.round(input.width * 0.14) : 0
-    const gap = input.showLegend ? Math.round(padding * 0.5) : 0
     const contentHeight = input.height - headerHeight - footerHeight - padding * 2
-    const mapWidth = input.width - padding * 2 - legendWidth - gap
+    const mapWidth = input.width - padding * 2
     const mapHeight = contentHeight
 
     return buildLayoutMetrics(input, {
       padding,
       headerHeight,
       footerHeight,
-      legendWidth,
+      legendWidth: 0,
       mapWidth: Math.max(0, mapWidth),
       mapHeight: Math.max(0, mapHeight),
     })
@@ -103,35 +99,21 @@ export function computeExportLayout(input: ExportLayoutInput): ExportLayoutMetri
   const padding = Math.max(8, Math.round(input.width * 0.012))
   const headerHeight = hasHeader ? Math.round(input.height * 0.055) : 0
   const footerHeight = input.showDatasetInfo ? Math.round(input.height * 0.025) : 0
-  const gap = input.showLegend ? Math.round(padding * 0.5) : 0
   const contentWidth = input.width - padding * 2
   const contentHeight = input.height - headerHeight - footerHeight - padding * 2
 
   let mapHeight = Math.max(0, contentHeight)
   let mapWidth = contentWidth
-  let legendWidth = 0
 
   if (mapHeight > 0 && contentWidth > 0) {
-    const desiredMapWidth = Math.min(contentWidth, Math.ceil(targetMapArea / mapHeight))
-    if (input.showLegend) {
-      const maxLegendWidth = Math.max(0, contentWidth - desiredMapWidth - gap)
-      const preferredLegendWidth = Math.round(input.width * 0.12)
-      legendWidth = Math.min(preferredLegendWidth, maxLegendWidth)
-      mapWidth = Math.max(0, contentWidth - legendWidth - gap)
-      if (mapWidth * mapHeight < targetMapArea) {
-        legendWidth = Math.max(0, contentWidth - desiredMapWidth - gap)
-        mapWidth = Math.max(0, contentWidth - legendWidth - gap)
-      }
-    } else {
-      mapWidth = desiredMapWidth
-    }
+    mapWidth = Math.min(contentWidth, Math.ceil(targetMapArea / mapHeight))
   }
 
   return buildLayoutMetrics(input, {
     padding,
     headerHeight,
     footerHeight,
-    legendWidth,
+    legendWidth: 0,
     mapWidth,
     mapHeight,
   })

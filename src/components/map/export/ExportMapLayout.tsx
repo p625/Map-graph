@@ -1,5 +1,5 @@
 import { forwardRef } from 'react'
-import { computeExportLayout } from '../../../domain/export/exportMapLayout'
+import type { ExportCompositionLayout, ExportCompositionSelection } from '../../../domain/export/exportCompositionLayout'
 import type { ExportMapSizing } from '../../../domain/export/exportMapLayout'
 import type { LabelContentMode } from '../../../domain/labels/labelEngine'
 import type { MapLabelFontSizes, MapLabelVisibility } from '../../../domain/labels/labelSettings'
@@ -10,11 +10,13 @@ import type { RegionScope } from '../../../domain/region/types'
 import type { RegionRenderMode } from '../../../domain/region/regionFocus'
 import type { OrganizationLegendItem, OrganizationLegendSettings } from '../../../domain/organization/organizationLegend'
 import { buildOrganizationLegendItems } from '../../../domain/organization/organizationLegend'
+import { applyEditorLegendToComposition } from '../../../domain/export/exportCompositionLayout'
+import { extractOrganizationalLegendRatioLayout } from '../../../domain/organization/exportOrganizationLegendLayout'
 import type { DistrictColorMap, LegendSpec, VisualizationContext } from '../../../domain/visualization/types'
+import { MAP_LOGICAL_HEIGHT, MAP_LOGICAL_WIDTH } from '../../../domain/map/mapViewport'
 import { useMapRenderModel } from '../../../hooks/useMapRenderModel'
 import { isOrganizationSynced, useOrganizationSnapshot } from '../../../store/organizationStore'
-import { CzechMap } from '../CzechMap'
-import { ExportMapLegend } from './ExportMapLegend'
+import { ExportCompositionCanvas } from './ExportCompositionCanvas'
 
 export interface ExportMapLayoutProps {
   title: string
@@ -24,6 +26,7 @@ export interface ExportMapLayoutProps {
   width: number
   height: number
   showLegend: boolean
+  showOrganizationLegend?: boolean
   showDatasetInfo: boolean
   showLabels: boolean
   labelVisibility?: MapLabelVisibility
@@ -40,8 +43,13 @@ export interface ExportMapLayoutProps {
   regionScope?: RegionScope
   regionRenderMode?: RegionRenderMode
   mapSizing?: ExportMapSizing
-  showOrganizationLegend?: boolean
   organizationLegendSettings?: OrganizationLegendSettings
+  composition: ExportCompositionLayout
+  compositionInteractive?: boolean
+  compositionPreviewScale?: number
+  selectedCompositionElement?: ExportCompositionSelection
+  onSelectCompositionElement?: (selection: ExportCompositionSelection) => void
+  onCompositionChange?: (composition: ExportCompositionLayout) => void
 }
 
 export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
@@ -54,6 +62,7 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
       width,
       height,
       showLegend,
+      showOrganizationLegend = false,
       showDatasetInfo,
       showLabels,
       labelVisibility,
@@ -69,39 +78,19 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
       strokeColor,
       regionScope,
       regionRenderMode = 'export-country',
-      mapSizing,
-      showOrganizationLegend = false,
       organizationLegendSettings,
+      composition,
+      compositionInteractive = false,
+      compositionPreviewScale = 1,
+      selectedCompositionElement = null,
+      onSelectCompositionElement,
+      onCompositionChange,
     },
     ref,
   ) {
-    const layout = computeExportLayout({
-      width,
-      height,
-      showLegend,
-      showDatasetInfo,
-      title,
-      subtitle,
-      sizing: mapSizing,
-    })
-
-    const {
-      padding,
-      headerHeight,
-      footerHeight,
-      legendWidth,
-      mapWidth,
-      mapHeight,
-      mapOnly,
-    } = layout
-
-    const titleSize = Math.round(width * 0.028)
-    const subtitleSize = Math.round(width * 0.016)
-    const footerSize = Math.round(width * 0.012)
-
     const { resolver, territories, fillStyles, boundaryLayers, labels, viewport } = useMapRenderModel({
-      width: mapWidth,
-      height: mapHeight,
+      width: MAP_LOGICAL_WIDTH,
+      height: MAP_LOGICAL_HEIGHT,
       colors,
       strokeColor,
       boundaryVisibility,
@@ -128,156 +117,58 @@ export const ExportMapLayout = forwardRef<HTMLDivElement, ExportMapLayoutProps>(
           })
         : []
 
-    const orgLegendConfig: OrganizationLegendSettings | undefined =
-      showOrganizationLegend && organizationLegendSettings
-        ? { ...organizationLegendSettings, enabled: true }
-        : undefined
+    const effectiveComposition =
+      composition.organizationalLegend.inheritPositionFromEditor &&
+      organizationLegendSettings
+        ? applyEditorLegendToComposition(
+            composition,
+            extractOrganizationalLegendRatioLayout(organizationLegendSettings.layout),
+          )
+        : {
+            ...composition,
+            title: { ...composition.title, text: composition.title.text || title },
+            organizationalLegend: {
+              ...composition.organizationalLegend,
+              visible: showOrganizationLegend && composition.organizationalLegend.visible,
+            },
+          }
 
     return (
-      <div
-        ref={ref}
-        style={{
-          width,
-          height,
-          backgroundColor: '#ffffff',
-          color: '#0f172a',
-          fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {Boolean(title.trim() || subtitle.trim()) && (
-          <div style={{ padding: `${padding}px ${padding}px 0`, minHeight: headerHeight }}>
-            {title.trim() && (
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: titleSize,
-                  fontWeight: 700,
-                  lineHeight: 1.2,
-                  color: '#0f172a',
-                }}
-              >
-                {title}
-              </h1>
-            )}
-            {subtitle && (
-              <p
-                style={{
-                  margin: `${Math.round(titleSize * 0.3)}px 0 0`,
-                  fontSize: subtitleSize,
-                  color: '#475569',
-                  lineHeight: 1.4,
-                }}
-              >
-                {subtitle}
-              </p>
-            )}
-          </div>
-        )}
-
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            padding: mapOnly
-              ? `${padding}px`
-              : `${Math.round(padding * 0.5)}px ${padding}px`,
-            gap: showLegend ? padding : 0,
-            minHeight: 0,
-          }}
-        >
-          <div
-            style={{
-              width: mapWidth,
-              height: mapHeight,
-              display: 'flex',
-              alignItems: 'stretch',
-              justifyContent: 'stretch',
-              minWidth: 0,
-              flexShrink: 0,
-            }}
-          >
-            <CzechMap
-              territories={territories}
-              fillStyles={fillStyles}
-              boundaryLayers={boundaryLayers}
-              labels={labels}
-              organizationLegendItems={orgLegendItems}
-              organizationLegendSettings={orgLegendConfig}
-              resolver={resolver}
-              interactive={false}
-              width={mapWidth}
-              height={mapHeight}
-              viewport={viewport?.viewBox ?? null}
-              className=""
-            />
-          </div>
-
-          {showLegend && (
-            <div
-              style={{
-                width: legendWidth,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: Math.round(padding * 0.6),
-                borderLeft: '1px solid #e2e8f0',
-                paddingLeft: padding,
-                overflow: 'hidden',
-                flexShrink: 0,
-              }}
-            >
-              <ExportMapLegend legend={legend} compact={width < 1600} />
-
-              {showDatasetInfo && (
-                <div
-                  style={{
-                    borderTop: '1px solid #e2e8f0',
-                    paddingTop: Math.round(padding * 0.5),
-                    fontSize: Math.max(11, Math.round(width * 0.011)),
-                    color: '#475569',
-                    lineHeight: 1.5,
-                  }}
-                >
-                  <p style={{ margin: 0, fontWeight: 600, color: '#0f172a' }}>Dataset</p>
-                  {dataset ? (
-                    <>
-                      <p style={{ margin: '4px 0 0' }}>{dataset.name}</p>
-                      {column && <p style={{ margin: '2px 0 0' }}>Sloupec: {column.name}</p>}
-                      <p style={{ margin: '2px 0 0' }}>
-                        Řádky: {dataset.matchedCount}/{dataset.recordCount}
-                      </p>
-                    </>
-                  ) : (
-                    <p style={{ margin: '4px 0 0' }}>
-                      {pluginName ?? 'Organizační vizualizace'}
-                    </p>
-                  )}
-                  {themeName && <p style={{ margin: '2px 0 0' }}>Téma: {themeName}</p>}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {!mapOnly && footerHeight > 0 && (
-          <div
-            style={{
-              padding: `0 ${padding}px ${padding}px`,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              fontSize: footerSize,
-              color: '#64748b',
-              minHeight: footerHeight,
-            }}
-          >
-            <span>Vytvořeno: {createdAt.toLocaleDateString('cs-CZ')}</span>
-            <span>Map Graph</span>
-          </div>
-        )}
+      <div ref={ref}>
+        <ExportCompositionCanvas
+          canvasWidth={width}
+          canvasHeight={height}
+          previewScale={compositionPreviewScale}
+          composition={effectiveComposition}
+          interactive={compositionInteractive}
+          selectedElement={selectedCompositionElement}
+          onSelectElement={onSelectCompositionElement}
+          onCompositionChange={onCompositionChange}
+          titleText={title}
+          subtitleText={subtitle}
+          showDataLegend={showLegend}
+          showDatasetInfo={showDatasetInfo}
+          dataLegend={legend}
+          dataset={dataset}
+          column={column}
+          pluginName={pluginName}
+          themeName={themeName}
+          createdAt={createdAt}
+          orgLegendItems={orgLegendItems}
+          orgLegendSettings={
+            showOrganizationLegend && organizationLegendSettings
+              ? { ...organizationLegendSettings, enabled: true }
+              : undefined
+          }
+          territories={territories}
+          fillStyles={fillStyles}
+          boundaryLayers={boundaryLayers}
+          labels={labels}
+          resolver={resolver}
+          viewport={viewport?.viewBox ?? null}
+          mapRenderWidth={MAP_LOGICAL_WIDTH}
+          mapRenderHeight={MAP_LOGICAL_HEIGHT}
+        />
       </div>
     )
   },

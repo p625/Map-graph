@@ -15,6 +15,7 @@ import {
   useOrganizationSnapshot,
 } from '../store/organizationStore'
 import { useNotifications } from '../store/notificationStore'
+import { StorageDiagnosticsPanel } from '../features/settings/storage/StorageDiagnosticsPanel'
 
 const moduleLabels: Record<WorkspaceModuleKey, string> = {
   organization: 'Organizace',
@@ -171,6 +172,11 @@ export function WorkspaceSettingsPage() {
           </div>
         </dl>
       </section>
+
+      <StorageDiagnosticsPanel
+        onExportWorkspace={handleExport}
+        onImportWorkspace={() => fileInputRef.current?.click()}
+      />
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
         <h3 className="font-semibold text-slate-900">Záloha</h3>

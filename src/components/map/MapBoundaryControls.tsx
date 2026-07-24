@@ -12,6 +12,7 @@ import {
 import type { LabelHaloStyle } from '../../domain/labels/labelHaloSettings'
 import { HALO_WIDTH_MAX, HALO_WIDTH_MIN } from '../../domain/labels/labelHaloSettings'
 import type { OrganizationLegendLabelMode } from '../../domain/organization/organizationLegend'
+import { resetOrganizationLegendPosition } from '../../domain/organization/organizationLegendLayout'
 import { useMapActions, useMapState } from '../../store/mapStore'
 import { useRegionLabelOverrides } from '../../store/regionLabelOverridesStore'
 import { useWorkplaceLabelOverrides } from '../../store/workplaceLabelOverridesStore'
@@ -506,6 +507,18 @@ export function MapBoundaryControls({ hasDataColumn = false }: { hasDataColumn?:
             <option value="light">Lehké bílé</option>
           </select>
         </label>
+        <button
+          type="button"
+          className="text-xs text-slate-600 underline"
+          disabled={!organizationLegend.enabled}
+          onClick={() =>
+            updateOrganizationLegend({
+              layout: resetOrganizationLegendPosition(organizationLegend.layout, 760, 460),
+            })
+          }
+        >
+          Obnovit pozici legendy
+        </button>
         <button
           type="button"
           className="text-xs text-slate-600 underline"

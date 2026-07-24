@@ -24,6 +24,7 @@ import {
   LOCAL_STORAGE_SOFT_LIMIT_BYTES,
   saveJson,
 } from '../utils/storage'
+import { DATASET_QUOTA_ERROR_MESSAGE } from '../domain/persistence/storageDiagnostics'
 import { useNotifications } from './notificationStore'
 
 const DATASET_STORAGE_KEY = 'map-graph-datasets-v2'
@@ -295,7 +296,7 @@ function DatasetPersistenceBridge({ state }: { state: DatasetState }) {
       notify({
         type: 'error',
         title: 'Uložení datasetů selhalo',
-        message: 'localStorage je plné. Smažte starší datasety nebo zmenšete import.',
+        message: DATASET_QUOTA_ERROR_MESSAGE,
       })
     }
   }, [state, notify])

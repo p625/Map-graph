@@ -9,16 +9,22 @@ import {
   type CustomExportPreset,
 } from '../../../domain/export/customExportPresets'
 import { exportPresets } from '../../../domain/export/exportPresets'
+import type { ExportCompositionLayout } from '../../../domain/export/exportCompositionLayout'
 import type { MapExportSettings } from './MapExportPanel'
 
 interface ExportPresetControlsProps {
   selectedPresetKey: string
   settings: MapExportSettings
+  exportCompositionLayout: ExportCompositionLayout
   onSelectPreset: (key: string, settings: MapExportSettings) => void
   onPresetKeyChange: (key: string) => void
 }
 
-function settingsToCustomPreset(settings: MapExportSettings, name: string): CustomExportPreset {
+function settingsToCustomPreset(
+  settings: MapExportSettings,
+  exportCompositionLayout: ExportCompositionLayout,
+  name: string,
+): CustomExportPreset {
   return createCustomExportPreset({
     name,
     width: settings.presetId === 'custom' ? settings.customWidth : settings.customWidth,
@@ -31,6 +37,7 @@ function settingsToCustomPreset(settings: MapExportSettings, name: string): Cust
     showLegend: settings.showLegend,
     showOrganizationLegend: settings.showOrganizationLegend,
     showDatasetInfo: settings.showDatasetInfo,
+    exportCompositionLayout,
     exportScope: settings.exportScope,
     quality: settings.quality,
   })
@@ -51,6 +58,7 @@ function customPresetToSettings(preset: CustomExportPreset, current: MapExportSe
     exportScope: preset.exportScope,
     mapSizeMode: preset.mapSizeMode,
     mapAreaPercent: preset.mapWidthPercent,
+    exportCompositionLayout: preset.exportCompositionLayout,
   }
 }
 
@@ -68,6 +76,7 @@ function builtinPresetToSettings(key: string, current: MapExportSettings): MapEx
 export function ExportPresetControls({
   selectedPresetKey,
   settings,
+  exportCompositionLayout,
   onSelectPreset,
   onPresetKeyChange,
 }: ExportPresetControlsProps) {
@@ -112,7 +121,11 @@ export function ExportPresetControls({
         : exportPresets.find((preset) => preset.id === settings.presetId)?.height ?? 1080
 
     const preset = createCustomExportPreset({
-      ...settingsToCustomPreset({ ...settings, customWidth: width, customHeight: height }, name),
+      ...settingsToCustomPreset(
+        { ...settings, customWidth: width, customHeight: height },
+        exportCompositionLayout,
+        name,
+      ),
       name,
       width,
       height,

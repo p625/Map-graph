@@ -39,7 +39,11 @@ export const DEFAULT_ORGANIZATION_LEGEND_SETTINGS: OrganizationLegendSettings = 
   layout: DEFAULT_ORGANIZATION_LEGEND_LAYOUT,
 }
 
-export { DEFAULT_ORGANIZATION_LEGEND_LAYOUT, sanitizeOrganizationLegendLayout } from './organizationLegendLayout'
+export {
+  DEFAULT_ORGANIZATION_LEGEND_LAYOUT,
+  resetOrganizationLegendPosition,
+  sanitizeOrganizationLegendLayout,
+} from './organizationLegendLayout'
 
 export function compareOrgUnitDesignations(a?: string, b?: string): number {
   const left = (a ?? '').trim()

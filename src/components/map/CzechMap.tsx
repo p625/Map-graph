@@ -2,13 +2,9 @@ import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import type { LayeredBoundaryStrokes } from '../../domain/color/colorEngine'
 import type { MapLabel } from '../../domain/labels/labelEngine'
 import {
-  clientPointToSvg,
   composeEditorViewBox,
-  EDITOR_ZOOM_STEP,
   parseViewBox,
   pixelDeltaToSvgDelta,
-  visibleToEditorState,
-  zoomViewBoxAtPoint,
   type MapEditorViewState,
 } from '../../domain/map/mapEditorViewport'
 import type { OrganizationLegendItem, OrganizationLegendSettings } from '../../domain/organization/organizationLegend'
@@ -17,6 +13,7 @@ import type { WorkplaceResolver } from '../../domain/territory/workplaceResolver
 import { OrganizationLegendOverlay } from './OrganizationLegendOverlay'
 import { OrganizationMapLegend } from './OrganizationMapLegend'
 import { MapLabelNode } from './MapLabelNode'
+import { useMapWheelZoom } from '../../hooks/useMapWheelZoom'
 
 export interface CzechMapProps {
   territories: TerritoryLayers
@@ -102,6 +99,7 @@ export const CzechMap = forwardRef<HTMLDivElement, CzechMapProps>(function Czech
   ref,
 ) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const highlightSet = useMemo(() => new Set(highlightedDistrictIds), [highlightedDistrictIds])
   const selectedSet = useMemo(() => new Set(selectedDistrictIds), [selectedDistrictIds])
   const hasHighlight = highlightedDistrictIds.length > 0
@@ -123,11 +121,22 @@ export const CzechMap = forwardRef<HTMLDivElement, CzechMapProps>(function Czech
   } | null>(null)
 
   const svgDisplayHeight = displayHeight ?? height
+  const fillContainer = displayHeight === undefined
   const baseViewBox = viewport ?? `0 0 ${width} ${height}`
   const displayViewBox = useMemo(() => {
     if (!interactive || !editorView) return baseViewBox
     return composeEditorViewBox(baseViewBox, editorView, width, height)
   }, [interactive, editorView, baseViewBox, width, height])
+
+  useMapWheelZoom(containerRef, {
+    enabled: interactive && Boolean(onEditorViewChange && editorView),
+    width,
+    height,
+    baseViewBox,
+    displayViewBox,
+    editorView,
+    onEditorViewChange,
+  })
 
   useEffect(() => {
     if (!interactive) return
@@ -186,18 +195,6 @@ export const CzechMap = forwardRef<HTMLDivElement, CzechMapProps>(function Czech
   function handleClick(districtId: string) {
     if (!isDistrictInteractive(districtId)) return
     onSelectDistrict?.(districtId)
-  }
-
-  function handleWheel(event: React.WheelEvent<SVGSVGElement>) {
-    if (!interactive || !onEditorViewChange || !editorView) return
-    event.preventDefault()
-    const rect = event.currentTarget.getBoundingClientRect()
-    const visible = getVisibleBox()
-    const svgPoint = clientPointToSvg(event.clientX, event.clientY, rect, visible)
-    const factor = event.deltaY < 0 ? EDITOR_ZOOM_STEP : 1 / EDITOR_ZOOM_STEP
-    const nextVisible = zoomViewBoxAtPoint(visible, svgPoint.x, svgPoint.y, factor)
-    const base = parseViewBox(baseViewBox, width, height)
-    onEditorViewChange(visibleToEditorState(base, nextVisible))
   }
 
   function handleSvgPointerDown(event: React.PointerEvent<SVGSVGElement>) {
@@ -295,20 +292,30 @@ export const CzechMap = forwardRef<HTMLDivElement, CzechMapProps>(function Czech
 
   return (
     <div
-      ref={ref}
+      ref={(node) => {
+        containerRef.current = node
+        if (typeof ref === 'function') ref(node)
+        else if (ref) ref.current = node
+      }}
       className={className}
-      style={{ position: 'relative', minHeight: svgDisplayHeight, overflow: 'hidden' }}
+      style={{
+        position: 'relative',
+        minHeight: fillContainer ? '100%' : svgDisplayHeight,
+        height: fillContainer ? '100%' : undefined,
+        overflow: 'hidden',
+        overscrollBehavior: 'contain',
+        touchAction: interactive ? 'none' : 'auto',
+      }}
     >
       <svg
         ref={svgRef}
         viewBox={displayViewBox}
         width="100%"
-        height={svgDisplayHeight}
+        height={fillContainer ? '100%' : svgDisplayHeight}
         style={{ display: 'block', cursor: isPanning ? 'grabbing' : panCursor }}
         role="img"
         aria-label="Mapa České republiky"
         onPointerLeave={handleSvgPointerLeave}
-        onWheel={handleWheel}
         onPointerDown={handleSvgPointerDown}
         onContextMenu={(event) => {
           if (interactive && onEditorViewChange) event.preventDefault()
@@ -411,8 +418,6 @@ export const CzechMap = forwardRef<HTMLDivElement, CzechMapProps>(function Czech
         <OrganizationLegendOverlay
           items={organizationLegendItems}
           settings={organizationLegendSettings}
-          containerWidth={width}
-          containerHeight={height}
         />
       )}
     </div>

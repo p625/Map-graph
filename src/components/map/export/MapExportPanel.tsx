@@ -1,12 +1,20 @@
-import { useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import type { ExportPresetId, ExportQuality } from '../../../domain/export/exportPresets'
 import { exportMapImage, getExportErrorMessage } from '../../../domain/export/exportMapImage'
 import { generateExportFilename } from '../../../domain/export/filenameGenerator'
+import {
+  applyEditorLegendToComposition,
+  applyMapFullCanvasLayout,
+  getExportCompositionPreset,
+  type ExportCompositionLayout,
+  type ExportCompositionPresetId,
+  type ExportCompositionSelection,
+} from '../../../domain/export/exportCompositionLayout'
+import type { ExportMapSizing, MapSizeMode } from '../../../domain/export/exportMapLayout'
+import { BALANCED_EXPORT_MAP_SIZING, DEFAULT_EXPORT_MAP_SIZING } from '../../../domain/export/exportMapLayout'
 import type { LabelContentMode } from '../../../domain/labels/labelEngine'
 import type { MapLabelFontSizes, MapLabelVisibility } from '../../../domain/labels/labelSettings'
 import type { BoundaryVisibility } from '../../../domain/territory/types'
-import type { ExportMapSizing, MapSizeMode } from '../../../domain/export/exportMapLayout'
-import { BALANCED_EXPORT_MAP_SIZING, DEFAULT_EXPORT_MAP_SIZING } from '../../../domain/export/exportMapLayout'
 import type { ExportMapScope } from '../../../domain/region/types'
 import type { LegendSpec, VisualizationContext } from '../../../domain/visualization/types'
 import type { Dataset } from '../../../domain/types/dataset'
@@ -16,6 +24,9 @@ import { applyRegionFocusColors, filterLegendForRegion } from '../../../domain/r
 import type { RegionRenderMode } from '../../../domain/region/regionFocus'
 import { isRegionFocused } from '../../../domain/region/regionScope'
 import { visualizationRegistry } from '../../../domain/visualization/VisualizationRegistry'
+import { extractOrganizationalLegendRatioLayout } from '../../../domain/organization/exportOrganizationLegendLayout'
+import type { OrganizationalLegendRatioLayout } from '../../../domain/organization/organizationLegendLayout'
+import { LEGEND_CONTENT_SCALE_DEFAULT } from '../../../domain/organization/organizationLegendStyle'
 import { useActiveVisualization } from '../../../hooks/useVisualization'
 import { useRegionScope } from '../../../hooks/useRegionScope'
 import { resolveTemplateColorThemeId } from '../../../domain/color-themes/colorThemeRegistry'
@@ -45,6 +56,9 @@ export interface MapExportSettings {
   exportScope: ExportMapScope
   mapSizeMode: MapSizeMode
   mapAreaPercent: number
+  inheritLegendLayoutFromEditor?: boolean
+  exportLegendLayout?: OrganizationalLegendRatioLayout | null
+  exportCompositionLayout?: ExportCompositionLayout
 }
 
 export interface MapTemplateApplyPayload {
@@ -96,6 +110,7 @@ export function MapExportPanel({
     colorThemeId: mapColorThemeId,
     columnKey: mapColumnKey,
     organizationLegend,
+    exportCompositionLayout,
     activeExportPresetKey,
   } = useMapState()
   const {
@@ -111,11 +126,15 @@ export function MapExportPanel({
     setFocusedRegion,
     clearFocusedRegion,
     setActiveExportPresetKey,
+    setExportCompositionLayout,
+    updateExportCompositionLayout,
   } = useMapActions()
   const { focusedRegionId } = useMapState()
   const canvasRef = useRef<HTMLDivElement>(null)
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedCompositionElement, setSelectedCompositionElement] =
+    useState<ExportCompositionSelection>(null)
 
   const [settings, setSettings] = useState<MapExportSettings>({
     title: defaultTitle,
@@ -260,6 +279,80 @@ export function MapExportPanel({
         ? { mode: 'custom', mapAreaPercent: settings.mapAreaPercent }
         : DEFAULT_EXPORT_MAP_SIZING
 
+  const effectiveComposition = useMemo(() => {
+    const withTitle = {
+      ...exportCompositionLayout,
+      title: {
+        ...exportCompositionLayout.title,
+        text: settings.title || exportCompositionLayout.title.text || exportTitle,
+      },
+      organizationalLegend: {
+        ...exportCompositionLayout.organizationalLegend,
+        visible: settings.showOrganizationLegend,
+      },
+    }
+    if (
+      withTitle.organizationalLegend.inheritPositionFromEditor ||
+      withTitle.organizationalLegend.inheritSizeFromEditor
+    ) {
+      return applyEditorLegendToComposition(
+        withTitle,
+        extractOrganizationalLegendRatioLayout(organizationLegend.layout),
+      )
+    }
+    return withTitle
+  }, [
+    exportCompositionLayout,
+    exportTitle,
+    organizationLegend.layout,
+    settings.showOrganizationLegend,
+    settings.title,
+  ])
+
+  const handleCompositionChange = useCallback(
+    (composition: ExportCompositionLayout) => {
+      setExportCompositionLayout(composition)
+    },
+    [setExportCompositionLayout],
+  )
+
+  const handleApplyCompositionPreset = useCallback(
+    (presetId: ExportCompositionPresetId) => {
+      const preset = getExportCompositionPreset(presetId)
+      setExportCompositionLayout({
+        ...preset,
+        title: { ...preset.title, text: settings.title || exportTitle },
+        organizationalLegend: {
+          ...preset.organizationalLegend,
+          visible: settings.showOrganizationLegend,
+        },
+      })
+    },
+    [exportTitle, setExportCompositionLayout, settings.showOrganizationLegend, settings.title],
+  )
+
+  const handleInheritLegendFromEditor = useCallback(() => {
+    setExportCompositionLayout(
+      applyEditorLegendToComposition(
+        exportCompositionLayout,
+        extractOrganizationalLegendRatioLayout(organizationLegend.layout),
+      ),
+    )
+  }, [exportCompositionLayout, organizationLegend.layout, setExportCompositionLayout])
+
+  const handleResetLegendContentScale = useCallback(() => {
+    updateExportCompositionLayout({
+      organizationalLegend: {
+        contentScale: LEGEND_CONTENT_SCALE_DEFAULT,
+        inheritSizeFromEditor: false,
+      },
+    })
+  }, [updateExportCompositionLayout])
+
+  const handleMapFullCanvas = useCallback(() => {
+    setExportCompositionLayout(applyMapFullCanvasLayout(effectiveComposition))
+  }, [effectiveComposition, setExportCompositionLayout])
+
   const layoutProps = {
     title: exportTitle,
     subtitle: settings.subtitle,
@@ -285,6 +378,15 @@ export function MapExportPanel({
     regionRenderMode: exportRegionMode,
     mapSizing,
     organizationLegendSettings: organizationLegend,
+    composition: effectiveComposition,
+  }
+
+  const previewLayoutProps = {
+    ...layoutProps,
+    compositionInteractive: true,
+    selectedCompositionElement,
+    onSelectCompositionElement: setSelectedCompositionElement,
+    onCompositionChange: handleCompositionChange,
   }
 
   return (
@@ -303,7 +405,11 @@ export function MapExportPanel({
             <input
               className="w-full rounded-md border border-slate-300 px-3 py-2"
               value={settings.title}
-              onChange={(e) => setSettings((s) => ({ ...s, title: e.target.value }))}
+              onChange={(e) => {
+                const title = e.target.value
+                setSettings((s) => ({ ...s, title }))
+                updateExportCompositionLayout({ title: { text: title } })
+              }}
             />
           </label>
 
@@ -320,15 +426,48 @@ export function MapExportPanel({
           <ExportPresetControls
             selectedPresetKey={activeExportPresetKey}
             settings={settings}
+            exportCompositionLayout={exportCompositionLayout}
             onPresetKeyChange={setActiveExportPresetKey}
             onSelectPreset={(key, nextSettings) => {
               setActiveExportPresetKey(key)
               setSettings(nextSettings)
+              if (nextSettings.exportCompositionLayout) {
+                setExportCompositionLayout(nextSettings.exportCompositionLayout)
+              }
             }}
           />
 
           <div className="space-y-2 text-sm">
+            <span className="font-medium text-slate-700">Kompozice exportu</span>
+            <select
+              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              value={exportCompositionLayout.presetId === 'custom' ? 'custom' : exportCompositionLayout.presetId}
+              onChange={(event) =>
+                handleApplyCompositionPreset(event.target.value as ExportCompositionPresetId)
+              }
+            >
+              <option value="map-full">Mapa přes celé plátno</option>
+              <option value="map-right-legend-left">Mapa vpravo, legenda vlevo</option>
+              <option value="map-top-right">Mapa vpravo nahoře</option>
+              <option value="custom">Vlastní rozložení</option>
+            </select>
+            <p className="text-xs text-slate-500">
+              Klikněte v náhledu na mapu, legendu nebo název a upravte je přetažením.
+            </p>
+            <button
+              type="button"
+              className="text-xs text-blue-600 hover:underline"
+              onClick={handleMapFullCanvas}
+            >
+              Mapa přes celou plochu
+            </button>
+          </div>
+
+          <div className="space-y-2 text-sm">
             <span className="font-medium text-slate-700">Velikost mapy v exportu</span>
+            <p className="text-xs text-slate-500">
+              Mapa, legenda a název jsou volně umístitelné prvky bez pevného sloupce.
+            </p>
             <select
               className="w-full rounded-md border border-slate-300 px-3 py-2"
               value={settings.mapSizeMode}
@@ -475,6 +614,112 @@ export function MapExportPanel({
               />
               <span>Zobrazit organizační legendu</span>
             </label>
+            {settings.showOrganizationLegend && (
+              <div className="ml-6 space-y-3 rounded-md border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                <p className="font-medium text-slate-700">Organizační legenda</p>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:underline"
+                    onClick={handleInheritLegendFromEditor}
+                  >
+                    Převzít z mapy
+                  </button>
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:underline"
+                    onClick={() => handleApplyCompositionPreset('map-top-right')}
+                  >
+                    Výchozí pozice
+                  </button>
+                </div>
+                <label className="block space-y-1">
+                  <span>Šířka: {Math.round(effectiveComposition.organizationalLegend.widthRatio * 100)} %</span>
+                  <input
+                    type="range"
+                    min={12}
+                    max={75}
+                    value={Math.round(effectiveComposition.organizationalLegend.widthRatio * 100)}
+                    onChange={(event) =>
+                      updateExportCompositionLayout({
+                        organizationalLegend: {
+                          widthRatio: Number(event.target.value) / 100,
+                          inheritSizeFromEditor: false,
+                          inheritPositionFromEditor: false,
+                        },
+                      })
+                    }
+                    className="w-full"
+                  />
+                </label>
+                <label className="block space-y-1">
+                  <span>
+                    Velikost obsahu:{' '}
+                    {Math.round(effectiveComposition.organizationalLegend.contentScale * 100)} %
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      className="rounded border border-slate-300 px-2 py-1"
+                      onClick={() =>
+                        updateExportCompositionLayout({
+                          organizationalLegend: {
+                            contentScale: Math.max(
+                              0.5,
+                              Math.round((effectiveComposition.organizationalLegend.contentScale - 0.05) * 100) /
+                                100,
+                            ),
+                            inheritSizeFromEditor: false,
+                          },
+                        })
+                      }
+                    >
+                      −
+                    </button>
+                    <input
+                      type="range"
+                      min={50}
+                      max={250}
+                      value={Math.round(effectiveComposition.organizationalLegend.contentScale * 100)}
+                      onChange={(event) =>
+                        updateExportCompositionLayout({
+                          organizationalLegend: {
+                            contentScale: Number(event.target.value) / 100,
+                            inheritSizeFromEditor: false,
+                          },
+                        })
+                      }
+                      className="w-full"
+                    />
+                    <button
+                      type="button"
+                      className="rounded border border-slate-300 px-2 py-1"
+                      onClick={() =>
+                        updateExportCompositionLayout({
+                          organizationalLegend: {
+                            contentScale: Math.min(
+                              2.5,
+                              Math.round((effectiveComposition.organizationalLegend.contentScale + 0.05) * 100) /
+                                100,
+                            ),
+                            inheritSizeFromEditor: false,
+                          },
+                        })
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    className="text-blue-600 hover:underline"
+                    onClick={handleResetLegendContentScale}
+                  >
+                    Obnovit výchozí velikost
+                  </button>
+                </label>
+              </div>
+            )}
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -643,7 +888,7 @@ export function MapExportPanel({
           </p>
         </div>
 
-        <MapExportPreview {...layoutProps} />
+        <MapExportPreview {...previewLayoutProps} />
       </div>
 
       {/* Skrytý canvas pro export v plném rozlišení — bez CSS scale */}

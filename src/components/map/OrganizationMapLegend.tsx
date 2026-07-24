@@ -3,6 +3,7 @@ import {
   clampLegendLayoutToBounds,
   computeAutoColumnCount,
   distributeItemsRowMajor,
+  legendPositionFromRatios,
   resolveOrganizationLegendSegments,
 } from '../../domain/organization/organizationLegendLayout'
 
@@ -24,8 +25,12 @@ export function OrganizationMapLegend({
   const layout = clampLegendLayoutToBounds(settings.layout, mapWidth, mapHeight)
   const columnCount = computeAutoColumnCount(layout, items, settings.labelMode, settings.showWorkplaceCount)
   const orderedItems = distributeItemsRowMajor(items, columnCount)
-  const left = (layout.xPercent / 100) * mapWidth
-  const top = (layout.yPercent / 100) * mapHeight
+  const { x: left, y: top } = legendPositionFromRatios(layout, {
+    viewportWidth: mapWidth,
+    viewportHeight: mapHeight,
+    legendWidth: layout.width,
+    legendHeight: layout.height,
+  })
   const fontSize = layout.fontSizePx
   const swatch = Math.max(8, fontSize)
   const rowHeight = fontSize * 1.35 + layout.rowGapPx + layout.itemGapPx

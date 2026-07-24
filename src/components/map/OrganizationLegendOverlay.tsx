@@ -4,6 +4,9 @@ import {
   clampLegendLayoutToBounds,
   computeAutoColumnCount,
   distributeItemsRowMajor,
+  legendPositionFromRatios,
+  legendRatiosFromPosition,
+  type OrganizationLegendLayout,
 } from '../../domain/organization/organizationLegendLayout'
 import { useMapActions } from '../../store/mapStore'
 import { OrganizationLegendItemRow } from './OrganizationLegendItemRow'
@@ -11,20 +14,19 @@ import { OrganizationLegendItemRow } from './OrganizationLegendItemRow'
 interface OrganizationLegendOverlayProps {
   items: OrganizationLegendItem[]
   settings: OrganizationLegendSettings
-  containerWidth: number
-  containerHeight: number
   interactive?: boolean
+  onLayoutCommit?: (layout: OrganizationLegendLayout) => void
 }
 
 export function OrganizationLegendOverlay({
   items,
   settings,
-  containerWidth,
-  containerHeight,
   interactive = true,
+  onLayoutCommit,
 }: OrganizationLegendOverlayProps) {
   const { updateOrganizationLegend } = useMapActions()
   const layout = settings.layout
+  const rootRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(
     null,
   )
@@ -34,11 +36,48 @@ export function OrganizationLegendOverlay({
     originW: number
     originH: number
   } | null>(null)
+  const pendingLayoutRef = useRef<Partial<OrganizationLegendLayout> | null>(null)
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 })
   const [dragging, setDragging] = useState(false)
+  const [localPosition, setLocalPosition] = useState<{ x: number; y: number } | null>(null)
+  const [localLayoutPatch, setLocalLayoutPatch] = useState<Partial<OrganizationLegendLayout> | null>(
+    null,
+  )
+
+  useEffect(() => {
+    const viewport = rootRef.current?.parentElement
+    if (!viewport) return
+
+    const updateViewportSize = () => {
+      const rect = viewport.getBoundingClientRect()
+      setViewportSize({
+        width: Math.round(rect.width),
+        height: Math.round(rect.height),
+      })
+    }
+
+    updateViewportSize()
+    const observer = new ResizeObserver(updateViewportSize)
+    observer.observe(viewport)
+    return () => observer.disconnect()
+  }, [])
+
+  const effectiveLayout = useMemo(
+    () => ({
+      ...layout,
+      ...(localLayoutPatch ?? {}),
+    }),
+    [layout, localLayoutPatch],
+  )
+
+  const fallbackViewportWidth = layout.width + 48
+  const fallbackViewportHeight = layout.height + 48
+  const viewportWidth = viewportSize.width || fallbackViewportWidth
+  const viewportHeight = viewportSize.height || fallbackViewportHeight
 
   const clampedLayout = useMemo(
-    () => clampLegendLayoutToBounds(layout, containerWidth, containerHeight),
-    [layout, containerWidth, containerHeight],
+    () => clampLegendLayoutToBounds(effectiveLayout, viewportWidth, viewportHeight),
+    [effectiveLayout, viewportHeight, viewportWidth],
   )
 
   const columnCount = useMemo(
@@ -51,21 +90,52 @@ export function OrganizationLegendOverlay({
     [items, columnCount],
   )
 
-  const left = (clampedLayout.xPercent / 100) * containerWidth
-  const top = (clampedLayout.yPercent / 100) * containerHeight
-
-  const persistLayout = useCallback(
-    (patch: Partial<typeof layout>) => {
-      updateOrganizationLegend({
-        layout: clampLegendLayoutToBounds(
-          { ...layout, ...patch },
-          containerWidth,
-          containerHeight,
-        ),
-      })
-    },
-    [layout, containerWidth, containerHeight, updateOrganizationLegend],
+  const bounds = useMemo(
+    () => ({
+      viewportWidth,
+      viewportHeight,
+      legendWidth: clampedLayout.width,
+      legendHeight: clampedLayout.height,
+    }),
+    [clampedLayout.height, clampedLayout.width, viewportHeight, viewportWidth],
   )
+
+  const storedPosition = useMemo(
+    () => legendPositionFromRatios(clampedLayout, bounds),
+    [bounds, clampedLayout],
+  )
+
+  const position = localPosition ?? storedPosition
+
+  const flushPendingLayout = useCallback(() => {
+    if (!pendingLayoutRef.current) return
+    const nextLayout = clampLegendLayoutToBounds(
+      { ...layout, ...pendingLayoutRef.current },
+      viewportWidth,
+      viewportHeight,
+    )
+    if (onLayoutCommit) {
+      onLayoutCommit(nextLayout)
+    } else {
+      updateOrganizationLegend({ layout: nextLayout })
+    }
+    pendingLayoutRef.current = null
+  }, [layout, onLayoutCommit, updateOrganizationLegend, viewportHeight, viewportWidth])
+
+  useEffect(() => {
+    if (onLayoutCommit || dragging || viewportSize.width <= 0 || viewportSize.height <= 0) return
+    const clamped = clampLegendLayoutToBounds(layout, viewportSize.width, viewportSize.height)
+    const needsUpdate =
+      Math.abs(clamped.xRatio - layout.xRatio) > 0.0001 ||
+      Math.abs(clamped.yRatio - layout.yRatio) > 0.0001 ||
+      Math.abs(clamped.widthRatio - layout.widthRatio) > 0.0001 ||
+      Math.abs(clamped.heightRatio - layout.heightRatio) > 0.0001 ||
+      clamped.width !== layout.width ||
+      clamped.height !== layout.height
+    if (needsUpdate) {
+      updateOrganizationLegend({ layout: clamped })
+    }
+  }, [dragging, layout, onLayoutCommit, updateOrganizationLegend, viewportSize.height, viewportSize.width])
 
   useEffect(() => {
     function onPointerMove(event: PointerEvent) {
@@ -74,34 +144,71 @@ export function OrganizationLegendOverlay({
         const dy = event.clientY - dragRef.current.startY
         const nextX = dragRef.current.originX + dx
         const nextY = dragRef.current.originY + dy
-        persistLayout({
-          xPercent: (nextX / containerWidth) * 100,
-          yPercent: (nextY / containerHeight) * 100,
-        })
+        const ratios = legendRatiosFromPosition(nextX, nextY, bounds)
+        const clampedPosition = legendPositionFromRatios(ratios, bounds)
+        setLocalPosition(clampedPosition)
+        pendingLayoutRef.current = {
+          xRatio: ratios.xRatio,
+          yRatio: ratios.yRatio,
+          xPercent: Math.round(ratios.xRatio * 100),
+          yPercent: Math.round(ratios.yRatio * 100),
+        }
       }
       if (resizeRef.current) {
         const dx = event.clientX - resizeRef.current.startX
         const dy = event.clientY - resizeRef.current.startY
-        persistLayout({
-          width: resizeRef.current.originW + dx,
-          height: resizeRef.current.originH + dy,
+        const nextWidth = resizeRef.current.originW + dx
+        const nextHeight = resizeRef.current.originH + dy
+        const nextLayout = clampLegendLayoutToBounds(
+          { ...layout, width: nextWidth, height: nextHeight },
+          bounds.viewportWidth,
+          bounds.viewportHeight,
+        )
+        setLocalLayoutPatch({
+          width: nextLayout.width,
+          height: nextLayout.height,
         })
+        pendingLayoutRef.current = {
+          width: nextLayout.width,
+          height: nextLayout.height,
+          xRatio: nextLayout.xRatio,
+          yRatio: nextLayout.yRatio,
+          widthRatio: nextLayout.widthRatio,
+          heightRatio: nextLayout.heightRatio,
+          xPercent: nextLayout.xPercent,
+          yPercent: nextLayout.yPercent,
+        }
       }
     }
 
     function onPointerUp() {
+      const wasDragging = dragRef.current !== null || resizeRef.current !== null
       dragRef.current = null
       resizeRef.current = null
       setDragging(false)
+      setLocalPosition(null)
+      setLocalLayoutPatch(null)
+      if (wasDragging) flushPendingLayout()
+    }
+
+    function onPointerCancel() {
+      pendingLayoutRef.current = null
+      dragRef.current = null
+      resizeRef.current = null
+      setDragging(false)
+      setLocalPosition(null)
+      setLocalLayoutPatch(null)
     }
 
     window.addEventListener('pointermove', onPointerMove)
     window.addEventListener('pointerup', onPointerUp)
+    window.addEventListener('pointercancel', onPointerCancel)
     return () => {
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('pointerup', onPointerUp)
+      window.removeEventListener('pointercancel', onPointerCancel)
     }
-  }, [containerWidth, containerHeight, persistLayout])
+  }, [bounds, flushPendingLayout, layout])
 
   if (!settings.enabled || items.length === 0) return null
 
@@ -109,77 +216,80 @@ export function OrganizationLegendOverlay({
     layout.backgroundMode === 'light' ? 'rgba(255, 255, 255, 0.82)' : 'transparent'
 
   return (
-    <div
-      className="absolute z-20 select-none"
-      style={{
-        left,
-        top,
-        width: clampedLayout.width,
-        height: clampedLayout.height,
-        background,
-        padding: 6,
-        boxSizing: 'border-box',
-        pointerEvents: interactive ? 'auto' : 'none',
-      }}
-      data-layer="organization-legend-overlay"
-    >
-      {interactive && (
-        <div
-          className="mb-1 h-3 cursor-grab rounded bg-slate-200/60 active:cursor-grabbing"
-          title="Přesunout legendu"
-          onPointerDown={(event) => {
-            event.preventDefault()
-            dragRef.current = {
-              startX: event.clientX,
-              startY: event.clientY,
-              originX: left,
-              originY: top,
-            }
-            setDragging(true)
-          }}
-        />
-      )}
-
+    <div ref={rootRef} className="pointer-events-none absolute inset-0 z-20" data-layer="organization-legend-layer">
       <div
-        className="overflow-hidden"
+        className="absolute select-none"
         style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
-          columnGap: layout.columnGapPx,
-          rowGap: layout.rowGapPx + layout.itemGapPx,
-          maxHeight: interactive ? 'calc(100% - 20px)' : '100%',
+          left: position.x,
+          top: position.y,
+          width: clampedLayout.width,
+          height: clampedLayout.height,
+          background,
+          padding: 6,
+          boxSizing: 'border-box',
+          pointerEvents: interactive ? 'auto' : 'none',
         }}
+        data-layer="organization-legend-overlay"
       >
-        {orderedItems.map((item) => (
-          <OrganizationLegendItemRow
-            key={item.leaderId}
-            item={item}
-            labelMode={settings.labelMode}
-            showWorkplaceCount={settings.showWorkplaceCount}
-            fontSizePx={layout.fontSizePx}
+        {interactive && (
+          <div
+            className="mb-1 h-3 cursor-grab rounded bg-slate-200/60 active:cursor-grabbing"
+            title="Přesunout legendu"
+            onPointerDown={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              dragRef.current = {
+                startX: event.clientX,
+                startY: event.clientY,
+                originX: position.x,
+                originY: position.y,
+              }
+              setDragging(true)
+            }}
           />
-        ))}
-      </div>
+        )}
 
-      {interactive && (
         <div
-          className="absolute bottom-0 right-0 h-3 w-3 cursor-se-resize rounded-sm bg-slate-400/70"
-          title="Změnit velikost legendy"
-          onPointerDown={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            resizeRef.current = {
-              startX: event.clientX,
-              startY: event.clientY,
-              originW: clampedLayout.width,
-              originH: clampedLayout.height,
-            }
-            setDragging(true)
+          className="overflow-hidden"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
+            columnGap: layout.columnGapPx,
+            rowGap: layout.rowGapPx + layout.itemGapPx,
+            maxHeight: interactive ? 'calc(100% - 20px)' : '100%',
           }}
-        />
-      )}
+        >
+          {orderedItems.map((item) => (
+            <OrganizationLegendItemRow
+              key={item.leaderId}
+              item={item}
+              labelMode={settings.labelMode}
+              showWorkplaceCount={settings.showWorkplaceCount}
+              fontSizePx={layout.fontSizePx}
+            />
+          ))}
+        </div>
 
-      {dragging && <span className="sr-only">Upravuji legendu</span>}
+        {interactive && (
+          <div
+            className="absolute bottom-0 right-0 h-3 w-3 cursor-se-resize rounded-sm bg-slate-400/70"
+            title="Změnit velikost legendy"
+            onPointerDown={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              resizeRef.current = {
+                startX: event.clientX,
+                startY: event.clientY,
+                originW: clampedLayout.width,
+                originH: clampedLayout.height,
+              }
+              setDragging(true)
+            }}
+          />
+        )}
+
+        {dragging && <span className="sr-only">Upravuji legendu</span>}
+      </div>
     </div>
   )
 }

@@ -13,6 +13,7 @@ import {
   MAP_LOGICAL_HEIGHT,
   MAP_LOGICAL_WIDTH,
 } from '../domain/map/mapViewport'
+import { MAP_EDITOR_VIEWPORT_HEIGHT_CSS } from '../domain/map/mapEditorLayout'
 import { mergeRegionLabelOverrideMaps } from '../domain/labels/regionLabelOverrides'
 import { mergeWorkplaceLabelOverrideMaps } from '../domain/labels/workplaceLabelOverrides'
 import type { RegionLabelOverrideMap } from '../domain/labels/regionLabelOverrides'
@@ -30,9 +31,6 @@ import { useCustomColorThemes } from '../store/customColorThemesStore'
 import { cn } from '../utils/cn'
 
 type MapViewMode = 'interactive' | 'export'
-
-/** Zvětšení pracovní mapy v editoru (~32 %), bez vlivu na exportní layout. */
-const EDITOR_DISPLAY_SCALE = 1.32
 
 type LabelEditTarget = {
   kind: 'workplace' | 'region'
@@ -86,7 +84,6 @@ export function MapPage() {
 
   const mapWidth = MAP_LOGICAL_WIDTH
   const mapHeight = MAP_LOGICAL_HEIGHT
-  const displayHeight = Math.round(mapHeight * EDITOR_DISPLAY_SCALE)
   const districtInteraction = plugin.districtInteraction ?? false
 
   const mergedWorkplaceOverrides = useMemo(
@@ -332,8 +329,11 @@ export function MapPage() {
       <RegionFocusControls />
 
       {viewMode === 'interactive' ? (
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
-          <div className="min-w-0">
+        <div
+          className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px] xl:items-start"
+          style={{ ['--map-editor-height' as string]: MAP_EDITOR_VIEWPORT_HEIGHT_CSS }}
+        >
+          <div className="min-w-0" style={{ height: 'var(--map-editor-height)' }}>
             <div className="mb-2 flex flex-wrap items-center gap-3 text-sm">
               <button
                 type="button"
@@ -347,18 +347,19 @@ export function MapPage() {
                 Kolečko = zoom · prostřední / pravé tlačítko / Space + levé = posun
               </span>
             </div>
-            <CzechMap
-              territories={territories}
-              fillStyles={fillStyles}
-              boundaryLayers={boundaryLayers}
-              labels={labels}
-              organizationLegendItems={organizationLegendItems}
-              organizationLegendSettings={organizationLegend}
-              resolver={resolver}
-              width={mapWidth}
-              height={mapHeight}
-              displayHeight={displayHeight}
-              viewport={viewport?.viewBox ?? null}
+            <div className="h-[calc(var(--map-editor-height)-2.5rem)] min-h-[640px]">
+              <CzechMap
+                className="h-full rounded-xl border border-slate-200 bg-white p-2 shadow-sm"
+                territories={territories}
+                fillStyles={fillStyles}
+                boundaryLayers={boundaryLayers}
+                labels={labels}
+                organizationLegendItems={organizationLegendItems}
+                organizationLegendSettings={organizationLegend}
+                resolver={resolver}
+                width={mapWidth}
+                height={mapHeight}
+                viewport={viewport?.viewBox ?? null}
               editorView={editorView}
               onEditorViewChange={setEditorView}
               interactiveDistrictIds={interactiveDistrictIds}
@@ -374,9 +375,12 @@ export function MapPage() {
               onRegionLabelDrag={handleRegionLabelDrag}
               onRegionLabelDragEnd={handleRegionLabelDragEnd}
               onRegionLabelTextEdit={handleRegionLabelTextEdit}
-            />
+              />
+            </div>
           </div>
-          <div className="space-y-4">
+          <div
+            className="space-y-4 xl:max-h-[var(--map-editor-height)] xl:overflow-y-auto xl:overscroll-contain"
+          >
             {showGradientEditor && <CustomGradientEditor context={context} />}
             <MapBoundaryControls hasDataColumn={Boolean(context.column)} />
             <MapLegend legend={legend} />

@@ -41,6 +41,18 @@ import {
   type OrganizationLegendLabelMode,
   type OrganizationLegendSettings,
 } from '../domain/organization/organizationLegend'
+import {
+  DEFAULT_ORGANIZATION_LEGEND_EXPORT_STATE,
+  sanitizeOrganizationLegendExportState,
+  type OrganizationLegendExportState,
+} from '../domain/organization/exportOrganizationLegendLayout'
+import {
+  DEFAULT_EXPORT_COMPOSITION_LAYOUT,
+  migrateLegacyExportToComposition,
+  sanitizeExportCompositionLayout,
+  type ExportCompositionLayout,
+  type ExportCompositionLayoutPatch,
+} from '../domain/export/exportCompositionLayout'
 import { DEFAULT_BOUNDARY_VISIBILITY } from '../domain/export/mapTemplates'
 import type { BoundaryVisibility } from '../domain/territory/types'
 import type { RegionViewMode } from '../domain/region/types'
@@ -82,6 +94,8 @@ interface MapState {
   regionLabelEditMode: boolean
   editorView: MapEditorViewState
   organizationLegend: OrganizationLegendSettings
+  organizationLegendExport: OrganizationLegendExportState
+  exportCompositionLayout: ExportCompositionLayout
   activeExportPresetKey: string
   selectedPolygon: HoveredPolygon | null
   focusedRegionId: string | null
@@ -118,6 +132,10 @@ type MapAction =
   | { type: 'reset-editor-view' }
   | { type: 'set-organization-legend'; organizationLegend: OrganizationLegendSettings }
   | { type: 'update-organization-legend'; patch: Partial<OrganizationLegendSettings> }
+  | { type: 'set-organization-legend-export'; organizationLegendExport: OrganizationLegendExportState }
+  | { type: 'update-organization-legend-export'; patch: Partial<OrganizationLegendExportState> }
+  | { type: 'set-export-composition-layout'; exportCompositionLayout: ExportCompositionLayout }
+  | { type: 'update-export-composition-layout'; patch: ExportCompositionLayoutPatch }
   | { type: 'set-active-export-preset-key'; activeExportPresetKey: string }
   | { type: 'set-selected-polygon'; polygon: HoveredPolygon | null }
   | { type: 'set-focused-region'; regionId: string }
@@ -149,6 +167,8 @@ const initialState: MapState = {
   regionLabelEditMode: false,
   editorView: DEFAULT_MAP_EDITOR_VIEW,
   organizationLegend: DEFAULT_ORGANIZATION_LEGEND_SETTINGS,
+  organizationLegendExport: DEFAULT_ORGANIZATION_LEGEND_EXPORT_STATE,
+  exportCompositionLayout: DEFAULT_EXPORT_COMPOSITION_LAYOUT,
   activeExportPresetKey: 'presentation-16-9',
   selectedPolygon: null,
   focusedRegionId: null,
@@ -193,6 +213,15 @@ function loadInitialMapState(): MapState {
       position: 'top-right',
       layout: sanitizeOrganizationLegendLayout(stored.organizationLegend?.layout),
     },
+    organizationLegendExport: sanitizeOrganizationLegendExportState(
+      stored.organizationLegendExport,
+    ),
+    exportCompositionLayout: stored.exportCompositionLayout
+      ? sanitizeExportCompositionLayout(stored.exportCompositionLayout)
+      : migrateLegacyExportToComposition(
+          stored.organizationLegendExport?.inheritFromEditor !== false,
+          stored.organizationLegendExport?.layout ?? null,
+        ),
     activeExportPresetKey: stored.activeExportPresetKey ?? 'presentation-16-9',
     focusedRegionId: stored.focusedRegionId ?? null,
     regionViewMode: stored.regionViewMode ?? 'overview',
@@ -372,6 +401,46 @@ function mapReducer(state: MapState, action: MapAction): MapState {
             : state.organizationLegend.layout,
         },
       }
+    case 'set-organization-legend-export':
+      return {
+        ...state,
+        organizationLegendExport: sanitizeOrganizationLegendExportState(
+          action.organizationLegendExport,
+        ),
+      }
+    case 'update-organization-legend-export':
+      return {
+        ...state,
+        organizationLegendExport: sanitizeOrganizationLegendExportState({
+          ...state.organizationLegendExport,
+          ...action.patch,
+        }),
+      }
+    case 'set-export-composition-layout':
+      return {
+        ...state,
+        exportCompositionLayout: sanitizeExportCompositionLayout(action.exportCompositionLayout),
+      }
+    case 'update-export-composition-layout':
+      return {
+        ...state,
+        exportCompositionLayout: sanitizeExportCompositionLayout({
+          ...state.exportCompositionLayout,
+          ...action.patch,
+          title: action.patch.title
+            ? { ...state.exportCompositionLayout.title, ...action.patch.title }
+            : state.exportCompositionLayout.title,
+          map: action.patch.map
+            ? { ...state.exportCompositionLayout.map, ...action.patch.map }
+            : state.exportCompositionLayout.map,
+          organizationalLegend: action.patch.organizationalLegend
+            ? {
+                ...state.exportCompositionLayout.organizationalLegend,
+                ...action.patch.organizationalLegend,
+              }
+            : state.exportCompositionLayout.organizationalLegend,
+        }),
+      }
     case 'set-active-export-preset-key':
       return { ...state, activeExportPresetKey: action.activeExportPresetKey }
     case 'set-selected-polygon':
@@ -440,6 +509,8 @@ export function MapProvider({ children }: { children: ReactNode }) {
       regionLabelEditMode: state.regionLabelEditMode,
       editorView: state.editorView,
       organizationLegend: state.organizationLegend,
+      organizationLegendExport: state.organizationLegendExport,
+      exportCompositionLayout: state.exportCompositionLayout,
       activeExportPresetKey: state.activeExportPresetKey,
       focusedRegionId: state.focusedRegionId,
       regionViewMode: state.regionViewMode,
@@ -466,6 +537,8 @@ export function MapProvider({ children }: { children: ReactNode }) {
     state.regionLabelEditMode,
     state.editorView,
     state.organizationLegend,
+    state.organizationLegendExport,
+    state.exportCompositionLayout,
     state.activeExportPresetKey,
     state.focusedRegionId,
     state.regionViewMode,
@@ -579,6 +652,14 @@ export function useMapActions() {
         dispatch({ type: 'update-organization-legend', patch: { enabled } }),
       setOrganizationLegendLabelMode: (labelMode: OrganizationLegendLabelMode) =>
         dispatch({ type: 'update-organization-legend', patch: { labelMode } }),
+      setOrganizationLegendExport: (organizationLegendExport: OrganizationLegendExportState) =>
+        dispatch({ type: 'set-organization-legend-export', organizationLegendExport }),
+      updateOrganizationLegendExport: (patch: Partial<OrganizationLegendExportState>) =>
+        dispatch({ type: 'update-organization-legend-export', patch }),
+      setExportCompositionLayout: (exportCompositionLayout: ExportCompositionLayout) =>
+        dispatch({ type: 'set-export-composition-layout', exportCompositionLayout }),
+      updateExportCompositionLayout: (patch: ExportCompositionLayoutPatch) =>
+        dispatch({ type: 'update-export-composition-layout', patch }),
       setActiveExportPresetKey: (activeExportPresetKey: string) =>
         dispatch({ type: 'set-active-export-preset-key', activeExportPresetKey }),
       setSelectedPolygon: (polygon: HoveredPolygon | null) =>

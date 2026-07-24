@@ -1,7 +1,19 @@
+import { MAP_LOGICAL_HEIGHT, MAP_LOGICAL_WIDTH } from '../map/mapViewport'
 import type { OrganizationLegendItem, OrganizationLegendLabelMode } from './organizationLegend'
 
-export interface OrganizationLegendLayout {
+export const LEGEND_EDGE_PADDING_PX = 12
+
+export interface OrganizationalLegendRatioLayout {
+  xRatio: number
+  yRatio: number
+  widthRatio: number
+  heightRatio: number
+}
+
+export interface OrganizationLegendLayout extends OrganizationalLegendRatioLayout {
+  /** @deprecated Synced from xRatio for backward compatibility. */
   xPercent: number
+  /** @deprecated Synced from yRatio for backward compatibility. */
   yPercent: number
   width: number
   height: number
@@ -13,9 +25,29 @@ export interface OrganizationLegendLayout {
   backgroundMode: 'transparent' | 'light'
 }
 
+export interface LegendViewportBounds {
+  viewportWidth: number
+  viewportHeight: number
+  legendWidth: number
+  legendHeight: number
+}
+
+export interface LegendMovementBounds {
+  minX: number
+  minY: number
+  maxX: number
+  maxY: number
+  availableWidth: number
+  availableHeight: number
+}
+
 export const DEFAULT_ORGANIZATION_LEGEND_LAYOUT: OrganizationLegendLayout = {
-  xPercent: 58,
-  yPercent: 2,
+  xRatio: 0.94,
+  yRatio: 0,
+  widthRatio: 280 / MAP_LOGICAL_WIDTH,
+  heightRatio: 220 / MAP_LOGICAL_HEIGHT,
+  xPercent: 94,
+  yPercent: 0,
   width: 280,
   height: 220,
   fontSizePx: 9,
@@ -35,28 +67,155 @@ export interface OrganizationLegendSegment {
   workplaceCount: number
 }
 
-export function sanitizeOrganizationLegendLayout(
-  value: Partial<OrganizationLegendLayout> | null | undefined,
-): OrganizationLegendLayout {
-  if (!value) return DEFAULT_ORGANIZATION_LEGEND_LAYOUT
-  return {
-    xPercent: clamp(value.xPercent, 0, 95, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.xPercent),
-    yPercent: clamp(value.yPercent, 0, 95, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.yPercent),
-    width: clamp(value.width, 120, 600, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.width),
-    height: clamp(value.height, 80, 500, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.height),
-    fontSizePx: clamp(value.fontSizePx, 6, 18, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.fontSizePx),
-    itemGapPx: clamp(value.itemGapPx, 0, 16, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.itemGapPx),
-    columnGapPx: clamp(value.columnGapPx, 4, 32, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.columnGapPx),
-    rowGapPx: clamp(value.rowGapPx, 0, 16, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.rowGapPx),
-    maxColumns: clamp(value.maxColumns, 1, 6, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.maxColumns),
-    backgroundMode: value.backgroundMode === 'light' ? 'light' : 'transparent',
-  }
-}
-
-function clamp(value: unknown, min: number, max: number, fallback: number): number {
+function clampNumber(value: unknown, min: number, max: number, fallback: number): number {
   const parsed = typeof value === 'number' ? value : Number(value)
   if (!Number.isFinite(parsed)) return fallback
   return Math.round(Math.min(max, Math.max(min, parsed)))
+}
+
+function clampRatio(value: unknown, fallback: number): number {
+  const parsed = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(parsed)) return fallback
+  return Math.min(1, Math.max(0, parsed))
+}
+
+export function computeLegendMovementBounds(input: LegendViewportBounds): LegendMovementBounds {
+  const minX = LEGEND_EDGE_PADDING_PX
+  const minY = LEGEND_EDGE_PADDING_PX
+  const maxX = Math.max(
+    minX,
+    input.viewportWidth - input.legendWidth - LEGEND_EDGE_PADDING_PX,
+  )
+  const maxY = Math.max(
+    minY,
+    input.viewportHeight - input.legendHeight - LEGEND_EDGE_PADDING_PX,
+  )
+  return {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    availableWidth: Math.max(0, maxX - minX),
+    availableHeight: Math.max(0, maxY - minY),
+  }
+}
+
+export function legendPositionFromRatios(
+  layout: Pick<OrganizationLegendLayout, 'xRatio' | 'yRatio'>,
+  bounds: LegendViewportBounds,
+): { x: number; y: number } {
+  const movement = computeLegendMovementBounds(bounds)
+  return {
+    x: movement.minX + layout.xRatio * movement.availableWidth,
+    y: movement.minY + layout.yRatio * movement.availableHeight,
+  }
+}
+
+export function legendRatiosFromPosition(
+  x: number,
+  y: number,
+  bounds: LegendViewportBounds,
+): { xRatio: number; yRatio: number } {
+  const movement = computeLegendMovementBounds(bounds)
+  const clampedX = Math.min(movement.maxX, Math.max(movement.minX, x))
+  const clampedY = Math.min(movement.maxY, Math.max(movement.minY, y))
+  return {
+    xRatio:
+      movement.availableWidth > 0
+        ? (clampedX - movement.minX) / movement.availableWidth
+        : 0,
+    yRatio:
+      movement.availableHeight > 0
+        ? (clampedY - movement.minY) / movement.availableHeight
+        : 0,
+  }
+}
+
+function migrateLegacyPercentPosition(
+  value: Partial<OrganizationLegendLayout>,
+  viewportWidth: number,
+  viewportHeight: number,
+): { xRatio: number; yRatio: number } {
+  const width = clampNumber(
+    value.width,
+    120,
+    600,
+    DEFAULT_ORGANIZATION_LEGEND_LAYOUT.width,
+  )
+  const height = clampNumber(
+    value.height,
+    80,
+    500,
+    DEFAULT_ORGANIZATION_LEGEND_LAYOUT.height,
+  )
+  const xPercent =
+    typeof value.xPercent === 'number'
+      ? value.xPercent
+      : DEFAULT_ORGANIZATION_LEGEND_LAYOUT.xPercent
+  const yPercent =
+    typeof value.yPercent === 'number'
+      ? value.yPercent
+      : DEFAULT_ORGANIZATION_LEGEND_LAYOUT.yPercent
+  const legacyX = (xPercent / 100) * viewportWidth
+  const legacyY = (yPercent / 100) * viewportHeight
+  return legendRatiosFromPosition(legacyX, legacyY, {
+    viewportWidth,
+    viewportHeight,
+    legendWidth: width,
+    legendHeight: height,
+  })
+}
+
+export function sanitizeOrganizationLegendLayout(
+  value: Partial<OrganizationLegendLayout> | null | undefined,
+  viewportWidth = 760,
+  viewportHeight = 460,
+): OrganizationLegendLayout {
+  if (!value) return DEFAULT_ORGANIZATION_LEGEND_LAYOUT
+
+  const width = clampNumber(value.width, 120, 600, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.width)
+  const height = clampNumber(value.height, 80, 500, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.height)
+
+  const hasPositionRatios =
+    typeof value.xRatio === 'number' &&
+    Number.isFinite(value.xRatio) &&
+    typeof value.yRatio === 'number' &&
+    Number.isFinite(value.yRatio)
+
+  const positionRatios = hasPositionRatios
+    ? {
+        xRatio: clampRatio(value.xRatio, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.xRatio),
+        yRatio: clampRatio(value.yRatio, DEFAULT_ORGANIZATION_LEGEND_LAYOUT.yRatio),
+      }
+    : migrateLegacyPercentPosition(value, viewportWidth, viewportHeight)
+
+  const widthRatio = clampRatio(
+    value.widthRatio ??
+      (viewportWidth > 0 ? width / viewportWidth : DEFAULT_ORGANIZATION_LEGEND_LAYOUT.widthRatio),
+    DEFAULT_ORGANIZATION_LEGEND_LAYOUT.widthRatio,
+  )
+  const heightRatio = clampRatio(
+    value.heightRatio ??
+      (viewportHeight > 0 ? height / viewportHeight : DEFAULT_ORGANIZATION_LEGEND_LAYOUT.heightRatio),
+    DEFAULT_ORGANIZATION_LEGEND_LAYOUT.heightRatio,
+  )
+
+  const clamped = clampLegendLayoutToBounds(
+    {
+      ...DEFAULT_ORGANIZATION_LEGEND_LAYOUT,
+      ...value,
+      width,
+      height,
+      xRatio: positionRatios.xRatio,
+      yRatio: positionRatios.yRatio,
+      widthRatio,
+      heightRatio,
+    },
+    viewportWidth,
+    viewportHeight,
+  )
+
+  return clamped
 }
 
 export function resolveOrganizationLegendSegments(
@@ -128,24 +287,49 @@ export function distributeItemsRowMajor<T>(items: T[], columnCount: number): T[]
 
 export function clampLegendLayoutToBounds(
   layout: OrganizationLegendLayout,
-  containerWidth: number,
-  containerHeight: number,
+  viewportWidth: number,
+  viewportHeight: number,
 ): OrganizationLegendLayout {
-  const maxWidth = Math.max(120, containerWidth - 8)
-  const maxHeight = Math.max(80, containerHeight - 8)
-  const x = Math.min(
-    (layout.xPercent / 100) * containerWidth,
-    containerWidth - Math.min(layout.width, maxWidth),
-  )
-  const y = Math.min(
-    (layout.yPercent / 100) * containerHeight,
-    containerHeight - Math.min(layout.height, maxHeight),
-  )
+  const maxWidth = Math.max(120, viewportWidth - LEGEND_EDGE_PADDING_PX * 2)
+  const maxHeight = Math.max(80, viewportHeight - LEGEND_EDGE_PADDING_PX * 2)
+  const width = Math.min(layout.width, maxWidth)
+  const height = Math.min(layout.height, maxHeight)
+
+  const bounds: LegendViewportBounds = {
+    viewportWidth,
+    viewportHeight,
+    legendWidth: width,
+    legendHeight: height,
+  }
+
+  const { x, y } = legendPositionFromRatios(layout, bounds)
+  const ratios = legendRatiosFromPosition(x, y, bounds)
+
   return {
     ...layout,
-    xPercent: containerWidth > 0 ? (x / containerWidth) * 100 : layout.xPercent,
-    yPercent: containerHeight > 0 ? (y / containerHeight) * 100 : layout.yPercent,
-    width: Math.min(layout.width, maxWidth),
-    height: Math.min(layout.height, maxHeight),
+    width,
+    height,
+    xRatio: ratios.xRatio,
+    yRatio: ratios.yRatio,
+    widthRatio: viewportWidth > 0 ? width / viewportWidth : layout.widthRatio,
+    heightRatio: viewportHeight > 0 ? height / viewportHeight : layout.heightRatio,
+    xPercent: Math.round(ratios.xRatio * 100),
+    yPercent: Math.round(ratios.yRatio * 100),
   }
+}
+
+export function resetOrganizationLegendPosition(
+  layout: OrganizationLegendLayout,
+  viewportWidth: number,
+  viewportHeight: number,
+): OrganizationLegendLayout {
+  return clampLegendLayoutToBounds(
+    {
+      ...layout,
+      xRatio: DEFAULT_ORGANIZATION_LEGEND_LAYOUT.xRatio,
+      yRatio: DEFAULT_ORGANIZATION_LEGEND_LAYOUT.yRatio,
+    },
+    viewportWidth,
+    viewportHeight,
+  )
 }

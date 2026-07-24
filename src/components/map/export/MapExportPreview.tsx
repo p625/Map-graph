@@ -44,13 +44,18 @@ export function MapExportPreview({
               height,
             }}
           >
-            <ExportMapLayout width={width} height={height} {...layoutProps} />
+            <ExportMapLayout
+              width={width}
+              height={height}
+              compositionPreviewScale={scale}
+              {...layoutProps}
+            />
           </div>
         </div>
       </div>
 
       <p className="text-xs text-slate-500">
-        Náhled odpovídá výslednému PNG. Při exportu se použije plné rozlišení podle zvoleného presetu.
+        Náhled odpovídá výslednému PNG. Klikněte na prvek v náhledu pro úpravu kompozice.
       </p>
     </div>
   )
